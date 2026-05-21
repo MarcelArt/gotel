@@ -5,6 +5,7 @@ import (
 
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/entities"
+	"github.com/MarcelArt/gotel/internal/v1/shared"
 	"github.com/gofiber/fiber/v3"
 	"github.com/morkid/paginate"
 	"gorm.io/gorm"
@@ -12,6 +13,9 @@ import (
 
 type IUserRoleRepo interface {
 	common.IBaseCrudRepo[entities.UserRole, UserRoleInput, UserRolePage]
+	GetRoleIDsByUserID(userID any) ([]uint, error)
+	DeleteByUserIDAndRoleIDs(c common.Context, userID any, roleIDs []uint) error
+	BulkCreate(c common.Context, input []shared.UserRoleInput) error
 }
 
 type UserRoleRepo struct {
@@ -79,4 +83,37 @@ func (r *UserRoleRepo) GetByID(c common.Context, id any) (entities.UserRole, err
 	userRole, err := gorm.G[entities.UserRole](r.db).Where("id = ?", id).First(ctx)
 
 	return userRole, err
+}
+
+func (r *UserRoleRepo) GetRoleIDsByUserID(userID any) ([]uint, error) {
+	var roleIDs []uint
+	err := r.db.Model(entities.UserRole{}).Where("user_id = ?", userID).Distinct("role_id").Pluck("role_id", &roleIDs).Error
+	return roleIDs, err
+}
+
+func (r *UserRoleRepo) DeleteByUserIDAndRoleIDs(c common.Context, userID any, roleIDs []uint) error {
+	ctx := c.Context()
+	_, err := gorm.G[entities.UserRole](r.db).Where("user_id = ? and role_id in ?", userID, roleIDs).Delete(ctx)
+
+	return err
+}
+
+func (r *UserRoleRepo) BulkCreate(c common.Context, input []shared.UserRoleInput) error {
+	ctx := c.Context()
+
+	userRoles, err := common.Cast[[]entities.UserRole](input)
+	if err != nil {
+		return fmt.Errorf("cannot cast input: %w", err)
+	}
+
+	err = gorm.G[entities.UserRole](r.db).CreateInBatches(ctx, &userRoles, 100)
+
+	return err
+}
+
+func (r *UserRoleRepo) BeginTx(tx *gorm.DB) shared.IUserRoleRepoTx {
+	return &UserRoleRepo{
+		db:        tx,
+		pageQuery: r.pageQuery,
+	}
 }

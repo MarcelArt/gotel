@@ -88,3 +88,10 @@ func (r *UserRepo) GetByUsernameOrEmail(c common.Context, usernameOrEmail string
 
 	return gorm.G[entities.User](r.db).Where("username = $1 or email = $1", usernameOrEmail).First(ctx)
 }
+
+// type IUserRoleRepo interface {
+// 	BeginTx(tx *gorm.DB) IUserRoleRepo
+// 	GetRoleIDsByUserID(userID any) ([]uint, error)
+// 	DeleteByUserIDAndRoleIDs(c common.Context, userID any, roleIDs []uint) error
+// 	BulkCreate(c common.Context, input []shared.UserRoleInput) error
+// }

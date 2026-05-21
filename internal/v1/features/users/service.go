@@ -4,7 +4,10 @@ import (
 	"fmt"
 
 	"github.com/MarcelArt/gotel/internal/common"
+	"github.com/MarcelArt/gotel/internal/configs"
 	"github.com/MarcelArt/gotel/internal/entities"
+	"github.com/MarcelArt/gotel/internal/v1/shared"
+	"github.com/MarcelArt/gotel/pkg/arrays"
 	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v3"
 	"github.com/morkid/paginate"
@@ -14,17 +17,20 @@ type IUserService interface {
 	common.IBaseCrudService[entities.User, UserInput, UserPage]
 	Login(c fiber.Ctx, input LoginInput) (LoginResponse, error)
 	RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bool) (LoginResponse, error)
+	AssignRoles(c common.Context, userID uint, newRoleIDs []uint) error
 }
 
 type UserService struct {
-	repo IUserRepo
+	repo   IUserRepo
+	urRepo shared.IUserRoleRepoTx
 }
 
 var _ IUserService = &UserService{}
 
-func NewUserService(repo IUserRepo) *UserService {
+func NewUserService(repo IUserRepo, urRepo shared.IUserRoleRepoTx) *UserService {
 	return &UserService{
-		repo: repo,
+		repo:   repo,
+		urRepo: urRepo,
 	}
 }
 
@@ -94,6 +100,42 @@ func (s *UserService) RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bo
 	common.GenerateCookies(c, res.AccessToken, res.RefreshToken, isRemember)
 
 	return res, nil
+}
+
+func (s *UserService) AssignRoles(c common.Context, userID uint, newRoleIDs []uint) error {
+	oldRoles, err := s.urRepo.GetRoleIDsByUserID(userID)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve old roles: %w", err)
+	}
+
+	idsToRemove, idsToAdd := arrays.DiffCheck(oldRoles, newRoleIDs)
+
+	tx := configs.DB.Begin()
+	defer tx.Rollback()
+
+	urRepo := s.urRepo.BeginTx(tx)
+
+	if len(idsToRemove) > 0 {
+		if err := urRepo.DeleteByUserIDAndRoleIDs(c, userID, idsToRemove); err != nil {
+			return fmt.Errorf("failed to delete old roles: %w", err)
+		}
+	}
+
+	if len(idsToAdd) > 0 {
+		userRoles := arrays.Map(idsToAdd, func(roleID uint) shared.UserRoleInput {
+			return shared.UserRoleInput{
+				UserID: userID,
+				RoleID: roleID,
+			}
+		})
+
+		if err := urRepo.BulkCreate(c, userRoles); err != nil {
+			return fmt.Errorf("failed to add new roles: %w", err)
+		}
+	}
+
+	tx.Commit()
+	return nil
 }
 
 func (s *UserService) generateTokenPair(user entities.User, isRemember bool, iss string) (LoginResponse, error) {

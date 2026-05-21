@@ -12,17 +12,14 @@ func SetupRoutes(api fiber.Router) {
 	v1 := api.Group("/v1")
 
 	uRepo := users.NewUserRepo(configs.DB)
-	uService := users.NewUserService(uRepo)
-
-	users.Setup(v1, uService)
-
 	rRepo := roles.NewRoleRepo(configs.DB)
-	rService := roles.NewRoleService(rRepo)
-
-	roles.Setup(v1, rService)
-
 	urRepo := user_roles.NewUserRoleRepo(configs.DB)
+
+	uService := users.NewUserService(uRepo, urRepo)
+	rService := roles.NewRoleService(rRepo)
 	urService := user_roles.NewUserRoleService(urRepo)
 
+	users.Setup(v1, uService)
+	roles.Setup(v1, rService)
 	user_roles.Setup(v1, urService)
 }

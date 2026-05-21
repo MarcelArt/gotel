@@ -187,6 +187,34 @@ func (h *UserHandler) Refresh(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(res, "Authenticated"))
 }
 
+// AssignRoles godoc
+// @Summary      Assign roles to user
+// @Description  Assign a list of role IDs to a user by user ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id       path      int     true  "User ID"
+// @Param        roleIDs  body      []uint  true  "List of Role IDs"
+// @Success      200      {object}  common.JSONResponse
+// @Failure      400      {object}  common.JSONResponse
+// @Failure      401      {object}  common.JSONResponse
+// @Failure      500      {object}  common.JSONResponse
+// @Security     ApiKeyAuth
+// @Router       /v1/users/{id}/roles [patch]
+func (h *UserHandler) AssignRoles(c fiber.Ctx) error {
+	id := fiber.Params[uint](c, "id")
+	var roleIDs []uint
+	if err := c.Bind().JSON(&roleIDs); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing json"))
+	}
+
+	if err := h.service.AssignRoles(c, id, roleIDs); err != nil {
+		return c.Status(common.StatusCodeFromError(err)).JSON(common.NewJSONResponse(err, "failed assigning roles"))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(nil, "Roles assigned"))
+}
+
 func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 	users := v1.Group("/users")
 
@@ -198,6 +226,8 @@ func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 	users.Get("/:id", middlewares.Authn(), h.GetByID)
 
 	users.Put("/:id", middlewares.Authn(), h.Update)
+
+	users.Patch("/:id/roles", middlewares.Authn(), h.AssignRoles)
 
 	users.Delete("/:id", middlewares.Authn(), h.Delete)
 }
