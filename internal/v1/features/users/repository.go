@@ -12,6 +12,7 @@ import (
 
 type IUserRepo interface {
 	common.IBaseCrudRepo[entities.User, UserInput, UserPage]
+	GetByUsernameOrEmail(c common.Context, usernameOrEmail string) (entities.User, error)
 }
 
 type UserRepo struct {
@@ -80,4 +81,10 @@ func (r *UserRepo) GetByID(c common.Context, id any) (entities.User, error) {
 	user, err := gorm.G[entities.User](r.db).Where("id = ?", id).First(ctx)
 
 	return user, err
+}
+
+func (r *UserRepo) GetByUsernameOrEmail(c common.Context, usernameOrEmail string) (entities.User, error) {
+	ctx := c.Context()
+
+	return gorm.G[entities.User](r.db).Where("username = $1 or email = $1", usernameOrEmail).First(ctx)
 }

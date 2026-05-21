@@ -12,6 +12,8 @@ import (
 
 type IUserService interface {
 	common.IBaseCrudService[entities.User, UserInput, UserPage]
+	Login(c fiber.Ctx, input LoginInput) (LoginResponse, error)
+	RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bool) (LoginResponse, error)
 }
 
 type UserService struct {
@@ -56,4 +58,60 @@ func (s *UserService) Delete(c common.Context, id any) error {
 
 func (s *UserService) GetByID(c common.Context, id any) (entities.User, error) {
 	return s.repo.GetByID(c, id)
+}
+
+func (s *UserService) Login(c fiber.Ctx, input LoginInput) (LoginResponse, error) {
+	var res LoginResponse
+	user, err := s.repo.GetByUsernameOrEmail(c, input.Username)
+	if err != nil {
+		return res, err
+	}
+
+	if ok, _ := argon2id.ComparePasswordAndHash(input.Password, user.Password); !ok {
+		return res, fiber.ErrUnauthorized
+	}
+
+	res, err = s.generateTokenPair(user, input.IsRemember, c.BaseURL())
+	if err != nil {
+		return res, fmt.Errorf("failed to generate token pair: %w", err)
+	}
+	common.GenerateCookies(c, res.AccessToken, res.RefreshToken, input.IsRemember)
+
+	return res, nil
+}
+
+func (s *UserService) RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bool) (LoginResponse, error) {
+	var res LoginResponse
+	user, err := s.repo.GetByID(c, userID)
+	if err != nil {
+		return res, err
+	}
+
+	res, err = s.generateTokenPair(user, isRemember, c.BaseURL())
+	if err != nil {
+		return res, fmt.Errorf("failed to generate token pair: %w", err)
+	}
+	common.GenerateCookies(c, res.AccessToken, res.RefreshToken, isRemember)
+
+	return res, nil
+}
+
+func (s *UserService) generateTokenPair(user entities.User, isRemember bool, iss string) (LoginResponse, error) {
+	var res LoginResponse
+	claims := map[string]any{
+		"sub":    user.Username,
+		"userId": user.ID,
+		"iss":    iss,
+		"aud":    iss,
+	}
+	at, rt, err := common.GenerateJWTPair(claims, nil, isRemember)
+	if err != nil {
+		return res, fmt.Errorf("failed generating token pair: %w", err)
+	}
+
+	res.AccessToken = at
+	res.RefreshToken = rt
+	res.User = user
+
+	return res, nil
 }

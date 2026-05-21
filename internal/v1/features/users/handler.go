@@ -1,7 +1,10 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/MarcelArt/gotel/internal/common"
+	"github.com/MarcelArt/gotel/internal/v1/middlewares"
 	"github.com/gofiber/fiber/v3"
 	_ "github.com/morkid/paginate"
 )
@@ -52,6 +55,9 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 // @Param			sort		query		string	false	"Sort"
 // @Param			filters		query		string	false	"Filter"
 // @Success      200    {object}  paginate.Page{items=[]UserPage}
+// @Failure      401    {object}  common.JSONResponse
+// @Failure      500    {object}  common.JSONResponse
+// @Security     ApiKeyAuth
 // @Router       /v1/users [get]
 func (h *UserHandler) Read(c fiber.Ctx) error {
 	users, _ := h.service.Read(c)
@@ -69,7 +75,9 @@ func (h *UserHandler) Read(c fiber.Ctx) error {
 // @Param        user  body      UserInput  true  "Updated user details"
 // @Success      200   {object}  common.JSONResponse
 // @Failure      400   {object}  common.JSONResponse
+// @Failure      401   {object}  common.JSONResponse
 // @Failure      500   {object}  common.JSONResponse
+// @Security     ApiKeyAuth
 // @Router       /v1/users/{id} [put]
 func (h *UserHandler) Update(c fiber.Ctx) error {
 	var user UserInput
@@ -92,7 +100,9 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 // @Produce      json
 // @Param        id   path      string  true  "User ID"
 // @Success      200  {object}  common.JSONResponse
+// @Failure      401  {object}  common.JSONResponse
 // @Failure      500  {object}  common.JSONResponse
+// @Security     ApiKeyAuth
 // @Router       /v1/users/{id} [delete]
 func (h *UserHandler) Delete(c fiber.Ctx) error {
 	if err := h.service.Delete(c, c.Params("id")); err != nil {
@@ -110,7 +120,9 @@ func (h *UserHandler) Delete(c fiber.Ctx) error {
 // @Produce      json
 // @Param        id   path      string  true  "User ID"
 // @Success      200  {object}  common.JSONResponse{items=entities.User}
+// @Failure      401  {object}  common.JSONResponse
 // @Failure      500  {object}  common.JSONResponse
+// @Security     ApiKeyAuth
 // @Router       /v1/users/{id} [get]
 func (h *UserHandler) GetByID(c fiber.Ctx) error {
 	user, err := h.service.GetByID(c, c.Params("id"))
@@ -121,12 +133,71 @@ func (h *UserHandler) GetByID(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(user, "User found"))
 }
 
+// Login godoc
+// @Summary      Login user
+// @Description  Authenticate a user with username/email and password, returning tokens
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body      LoginInput  true  "Login credentials"
+// @Success      200          {object}  common.JSONResponse{items=LoginResponse}
+// @Failure      400          {object}  common.JSONResponse
+// @Failure      401          {object}  common.JSONResponse
+// @Router       /v1/users/login [post]
+func (h *UserHandler) Login(c fiber.Ctx) error {
+	var input LoginInput
+	if err := c.Bind().JSON(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing json"))
+	}
+
+	res, err := h.service.Login(c, input)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(common.NewJSONResponse(err, "invalid username or password"))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(res, "User logged in"))
+}
+
+// Refresh godoc
+// @Summary      Refresh token
+// @Description  Regenerate access and refresh token pair using the refresh token from header
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        X-Refresh-Token  header    string  true  "Refresh token"
+// @Success      200              {object}  common.JSONResponse{items=LoginResponse}
+// @Failure      400              {object}  common.JSONResponse
+// @Failure      401              {object}  common.JSONResponse
+// @Failure      500              {object}  common.JSONResponse
+// @Router       /v1/users/refresh [post]
+func (h *UserHandler) Refresh(c fiber.Ctx) error {
+	claims := common.FiberCtxToClaims(c)
+	id := claims["userId"]
+
+	isRemember, ok := claims["isRemember"].(bool)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(fmt.Errorf("missing isRemember claim"), "invalid refresh token"))
+	}
+
+	res, err := h.service.RegenerateTokenPair(c, id, isRemember)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed generating tokens"))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(res, "Authenticated"))
+}
+
 func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 	users := v1.Group("/users")
 
 	users.Post("/", h.Create)
-	users.Get("/", h.Read)
-	users.Get("/:id", h.GetByID)
-	users.Put("/:id", h.Update)
-	users.Delete("/:id", h.Delete)
+	users.Post("/login", h.Login)
+	users.Post("/refresh", middlewares.Refresh(), h.Refresh)
+
+	users.Get("/", middlewares.Authn(), h.Read)
+	users.Get("/:id", middlewares.Authn(), h.GetByID)
+
+	users.Put("/:id", middlewares.Authn(), h.Update)
+
+	users.Delete("/:id", middlewares.Authn(), h.Delete)
 }
