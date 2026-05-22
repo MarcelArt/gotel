@@ -11,7 +11,9 @@ type UserRoleInput struct {
 }
 
 type UserRolePage struct {
-	ID     uint `json:"ID"`
-	UserID uint `json:"userId"`
-	RoleID uint `json:"roleId"`
+	ID       uint   `json:"ID"`
+	UserID   uint   `json:"userId"`
+	RoleID   uint   `json:"roleId"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
 }

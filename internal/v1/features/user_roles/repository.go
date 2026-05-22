@@ -27,8 +27,17 @@ var _ IUserRoleRepo = &UserRoleRepo{}
 
 func NewUserRoleRepo(db *gorm.DB) *UserRoleRepo {
 	return &UserRoleRepo{
-		db:        db,
-		pageQuery: "SELECT id, user_id, role_id FROM user_roles",
+		db: db,
+		pageQuery: `
+			SELECT 
+				ur.*,
+				u.username as username,
+				r."name" as role
+			from user_roles ur 
+			join users u on ur.user_id = u.id 
+			join roles r on ur.role_id = r.id 
+			where ur.deleted_at isnull
+		`,
 	}
 }
 
