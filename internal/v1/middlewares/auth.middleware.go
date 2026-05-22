@@ -34,9 +34,9 @@ func Authz(permissionKey string) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		claims := common.FiberCtxToClaims(c)
 
-		permissions, ok := claims["permissions"].([]string)
-		if !ok {
-			return c.Status(fiber.StatusForbidden).JSON(common.NewJSONResponse(nil, "unauthorized"))
+		permissions, err := common.ParseClaimsToStringSlice(claims["permissions"])
+		if err != nil {
+			return c.Status(fiber.StatusForbidden).JSON(common.NewJSONResponse(err, "unauthorized"))
 		}
 
 		permission := arrays.Find(permissions, func(p string) bool {

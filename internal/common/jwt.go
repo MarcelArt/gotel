@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,6 +11,8 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var ErrNotStringSlice = errors.New("not string slice")
 
 func GenerateJWTPair(claims map[string]any, permissions any, isRemember bool) (string, string, error) {
 	today := time.Now()
@@ -70,3 +73,22 @@ func ParseToken(tokenStr string) (jwt.MapClaims, error) {
 	return nil, fmt.Errorf("invalid token")
 }
 
+func ParseClaimsToStringSlice(v any) ([]string, error) {
+	items, ok := v.([]any)
+	if !ok {
+		return nil, ErrNotStringSlice
+	}
+
+	result := make([]string, 0, len(items))
+
+	for _, item := range items {
+		s, ok := item.(string)
+		if !ok {
+			return nil, ErrNotStringSlice
+		}
+		result = append(result, s)
+	}
+
+	return result, nil
+
+}
