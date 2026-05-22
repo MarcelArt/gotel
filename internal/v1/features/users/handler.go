@@ -251,7 +251,7 @@ func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 
 	users.Put("/:id", middlewares.Authn(), h.Update)
 
-	users.Patch("/:id/roles", middlewares.Authn(), h.AssignRoles)
+	users.Patch("/:id/roles", middlewares.Authn(), middlewares.Authz("users#update"), h.AssignRoles)
 
-	users.Delete("/:id", middlewares.Authn(), h.Delete)
+	users.Delete("/:id", middlewares.Authn(), middlewares.Authz("users#delete"), h.Delete)
 }

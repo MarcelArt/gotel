@@ -138,9 +138,9 @@ func (h *RoleHandler) SetupRoutes(v1 fiber.Router) {
 	// Apply authentication middleware (Authn) to all roles routes
 	roles.Use(middlewares.Authn())
 
-	roles.Post("/", h.Create)
-	roles.Get("/", h.Read)
-	roles.Get("/:id", h.GetByID)
-	roles.Put("/:id", h.Update)
-	roles.Delete("/:id", h.Delete)
+	roles.Post("/", middlewares.Authz("roles#create"), h.Create)
+	roles.Get("/", middlewares.Authz("roles#read"), h.Read)
+	roles.Get("/:id", middlewares.Authz("roles#read"), h.GetByID)
+	roles.Put("/:id", middlewares.Authz("roles#update"), h.Update)
+	roles.Delete("/:id", middlewares.Authz("roles#delete"), h.Delete)
 }

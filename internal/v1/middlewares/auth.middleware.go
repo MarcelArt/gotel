@@ -3,6 +3,8 @@ package middlewares
 import (
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/configs"
+	"github.com/MarcelArt/gotel/internal/enums"
+	"github.com/MarcelArt/gotel/pkg/arrays"
 	jwtware "github.com/gofiber/contrib/v3/jwt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/extractors"
@@ -26,4 +28,25 @@ func Authn() fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(common.NewJSONResponse(err, "unauthorized"))
 		},
 	})
+}
+
+func Authz(permissionKey string) fiber.Handler {
+	return func(c fiber.Ctx) error {
+		claims := common.FiberCtxToClaims(c)
+
+		permissions, ok := claims["permissions"].([]string)
+		if !ok {
+			return c.Status(fiber.StatusForbidden).JSON(common.NewJSONResponse(nil, "unauthorized"))
+		}
+
+		permission := arrays.Find(permissions, func(p string) bool {
+			return p == enums.PermFullAccess || p == permissionKey
+		})
+
+		if permission == nil {
+			return c.Status(fiber.StatusForbidden).JSON(common.NewJSONResponse(nil, "unauthorized"))
+		}
+
+		return c.Next()
+	}
 }
