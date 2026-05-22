@@ -71,6 +71,37 @@
         {{ end }}
     </div>
 
+    <!-- Pagination Controls -->
+    {{ if gt .Pagination.TotalPages 1 }}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding: 16px 24px; border: 1px solid rgba(185, 200, 222, 0.08); border-radius: var(--rounded-lg); background: rgba(23, 31, 51, 0.25); backdrop-filter: blur(8px);">
+        <div class="body-sm" style="color: var(--color-secondary);">
+            Showing page <strong style="color: white;">{{ .Pagination.CurrentPage }}</strong> of <strong style="color: white;">{{ .Pagination.TotalPages }}</strong> (<strong style="color: white;">{{ .Pagination.Total }}</strong> total roles)
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.First }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.First }}disabled{{ else }}
+                    hx-get="/roles?page={{ .Pagination.PrevPage }}&size={{ .Pagination.Size }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; display: inline-block; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span style="display: inline-block; vertical-align: middle;">Previous</span>
+            </button>
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.Last }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.Last }}disabled{{ else }}
+                    hx-get="/roles?page={{ .Pagination.NextPage }}&size={{ .Pagination.Size }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <span style="display: inline-block; vertical-align: middle;">Next</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; display: inline-block; vertical-align: middle;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+    {{ end }}
+
     <!-- Create Role Modal -->
     <div class="modal-backdrop" x-show="showCreateModal" x-cloak style="animation: fadeIn 0.2s ease;">
         <div class="glass-card" @click.away="showCreateModal = false" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border-color: rgba(192, 193, 255, 0.15);">

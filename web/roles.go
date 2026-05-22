@@ -38,12 +38,25 @@ type RoleWebViewModel struct {
 	Permissions []string
 }
 
+type PaginationInfo struct {
+	Page        int64
+	CurrentPage int64
+	Size        int64
+	TotalPages  int64
+	Total       int64
+	Last        bool
+	First       bool
+	NextPage    int64
+	PrevPage    int64
+}
+
 type RolesViewModel struct {
 	BaseViewModel
 	Roles                []RoleWebViewModel
 	AvailablePermissions []PermissionDefinition
 	Error                string
 	Success              string
+	Pagination           PaginationInfo
 }
 
 type RoleEditViewModel struct {
@@ -57,7 +70,7 @@ func (h *WebHandler) getRolesViewModel(c fiber.Ctx, userID any) (RolesViewModel,
 		return RolesViewModel{}, err
 	}
 
-	_, rolesList := h.roleService.Read(c)
+	pageInfo, rolesList := h.roleService.Read(c)
 	webRoles := make([]RoleWebViewModel, len(rolesList))
 	for i, r := range rolesList {
 		perms, _ := r.Permissions.Deserialize()
@@ -69,6 +82,23 @@ func (h *WebHandler) getRolesViewModel(c fiber.Ctx, userID any) (RolesViewModel,
 		}
 	}
 
+	prevPage := pageInfo.Page - 1
+	if prevPage < 0 {
+		prevPage = 0
+	}
+
+	pagination := PaginationInfo{
+		Page:        pageInfo.Page,
+		CurrentPage: pageInfo.Page + 1,
+		Size:        pageInfo.Size,
+		TotalPages:  pageInfo.TotalPages,
+		Total:       pageInfo.Total,
+		Last:        pageInfo.Last,
+		First:       pageInfo.First,
+		NextPage:    pageInfo.Page + 1,
+		PrevPage:    prevPage,
+	}
+
 	return RolesViewModel{
 		BaseViewModel: BaseViewModel{
 			Title:     "Roles Management - Gotel",
@@ -77,6 +107,7 @@ func (h *WebHandler) getRolesViewModel(c fiber.Ctx, userID any) (RolesViewModel,
 		},
 		Roles:                webRoles,
 		AvailablePermissions: AvailablePermissions,
+		Pagination:           pagination,
 	}, nil
 }
 
