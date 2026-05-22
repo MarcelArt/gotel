@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 
+	"github.com/MarcelArt/gotel/internal/v1/features/roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/users"
 	"github.com/gofiber/fiber/v3"
 )
@@ -12,11 +13,13 @@ var views = make(map[string]*template.Template)
 
 type WebHandler struct {
 	userService users.IUserService
+	roleService roles.IRoleService
 }
 
-func NewWebHandler(userService users.IUserService) *WebHandler {
+func NewWebHandler(userService users.IUserService, roleService roles.IRoleService) *WebHandler {
 	return &WebHandler{
 		userService: userService,
+		roleService: roleService,
 	}
 }
 

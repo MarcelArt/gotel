@@ -689,3 +689,24 @@ a:hover {
     font-size: 20px;
   }
 }
+
+/* Alpine.js Cloak */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Modal Dialog Styling */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(6, 14, 32, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}

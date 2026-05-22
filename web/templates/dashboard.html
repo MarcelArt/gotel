@@ -27,31 +27,13 @@
                 Dashboard
             </a>
             <a class="menu-item" 
-               :class="{ 'active': currentTab === 'bookings' }" 
-               @click="currentTab = 'bookings'; sidebarOpen = false"
-               hx-get="/bookings"
+               :class="{ 'active': currentTab === 'roles' }" 
+               @click="currentTab = 'roles'; sidebarOpen = false"
+               hx-get="/roles"
                hx-target="#outlet"
                hx-push-url="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                Bookings
-            </a>
-            <a class="menu-item" 
-               :class="{ 'active': currentTab === 'rooms' }" 
-               @click="currentTab = 'rooms'; sidebarOpen = false"
-               hx-get="/rooms"
-               hx-target="#outlet"
-               hx-push-url="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M5 17V5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v12M9 6h6M9 10h6M12 14h.01"></path></svg>
-                Rooms
-            </a>
-            <a class="menu-item" 
-               :class="{ 'active': currentTab === 'staff' }" 
-               @click="currentTab = 'staff'; sidebarOpen = false"
-               hx-get="/staff"
-               hx-target="#outlet"
-               hx-push-url="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Staff
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Roles
             </a>
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'settings' }" 
