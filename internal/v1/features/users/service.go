@@ -151,7 +151,13 @@ func (s *UserService) generateTokenPair(user entities.User, isRemember bool, iss
 		"iss":    iss,
 		"aud":    iss,
 	}
-	at, rt, err := common.GenerateJWTPair(claims, nil, isRemember)
+
+	permissions, err := s.repo.GetPermissions(user.ID)
+	if err != nil {
+		return res, fmt.Errorf("failed retrieving permissions: %w", err)
+	}
+
+	at, rt, err := common.GenerateJWTPair(claims, permissions, isRemember)
 	if err != nil {
 		return res, fmt.Errorf("failed generating token pair: %w", err)
 	}
