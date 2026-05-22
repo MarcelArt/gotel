@@ -25,6 +25,8 @@ var AvailablePermissions = []PermissionDefinition{
 	{"roles#read", "Read Roles", "Allows listing and viewing roles"},
 	{"roles#update", "Update Roles", "Allows updating roles"},
 	{"roles#delete", "Delete Roles", "Allows deleting roles"},
+	{"users#create", "Create Users", "Allows creating new users"},
+	{"users#read", "Read Users", "Allows listing and viewing users"},
 	{"users#update", "Update Users", "Allows assigning roles to users"},
 	{"users#delete", "Delete Users", "Allows deleting users"},
 }
