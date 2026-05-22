@@ -24,7 +24,7 @@ var _ IRoleRepo = &RoleRepo{}
 func NewRoleRepo(db *gorm.DB) *RoleRepo {
 	return &RoleRepo{
 		db:        db,
-		pageQuery: "SELECT id, name, description, permissions FROM roles",
+		pageQuery: "SELECT id, name, description, permissions FROM roles where deleted_at isnull",
 	}
 }
 

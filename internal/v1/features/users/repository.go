@@ -27,7 +27,7 @@ var _ IUserRepo = &UserRepo{}
 func NewUserRepo(db *gorm.DB) *UserRepo {
 	return &UserRepo{
 		db:        db,
-		pageQuery: "SELECT id, username, email FROM users",
+		pageQuery: "SELECT id, username, email FROM users where deleted_at isnull",
 	}
 }
 
