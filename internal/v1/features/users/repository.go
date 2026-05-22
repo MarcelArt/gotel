@@ -1,6 +1,7 @@
 package users
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/MarcelArt/gotel/internal/common"
@@ -13,6 +14,7 @@ import (
 type IUserRepo interface {
 	common.IBaseCrudRepo[entities.User, UserInput, UserPage]
 	GetByUsernameOrEmail(c common.Context, usernameOrEmail string) (entities.User, error)
+	GetPermissions(id any) ([]string, error)
 }
 
 type UserRepo struct {
@@ -89,9 +91,27 @@ func (r *UserRepo) GetByUsernameOrEmail(c common.Context, usernameOrEmail string
 	return gorm.G[entities.User](r.db).Where("username = $1 or email = $1", usernameOrEmail).First(ctx)
 }
 
-// type IUserRoleRepo interface {
-// 	BeginTx(tx *gorm.DB) IUserRoleRepo
-// 	GetRoleIDsByUserID(userID any) ([]uint, error)
-// 	DeleteByUserIDAndRoleIDs(c common.Context, userID any, roleIDs []uint) error
-// 	BulkCreate(c common.Context, input []shared.UserRoleInput) error
-// }
+func (r *UserRepo) GetPermissions(id any) ([]string, error) {
+	var permissionsJSON string
+	permissions := make([]string, 0)
+
+	query := `
+		SELECT 
+			jsonb_agg(DISTINCT t.permissions) as permissions
+		FROM (
+			SELECT jsonb_array_elements_text(r.permissions ) AS permissions
+			FROM roles r 
+			left join user_roles ur on r.id = ur.role_id 
+			where r.deleted_at isnull
+			and ur.user_id = ?
+		) t;
+	`
+
+	if err := r.db.Raw(query, id).Scan(&permissionsJSON).Error; err != nil {
+		return nil, fmt.Errorf("failed retrieving permissions: %w", err)
+	}
+
+	err := json.Unmarshal([]byte(permissionsJSON), &permissions)
+
+	return permissions, err
+}

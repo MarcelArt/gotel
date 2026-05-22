@@ -18,6 +18,7 @@ type IUserService interface {
 	Login(c fiber.Ctx, input LoginInput) (LoginResponse, error)
 	RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bool) (LoginResponse, error)
 	AssignRoles(c common.Context, userID uint, newRoleIDs []uint) error
+	GetPermissions(userID any) ([]string, error)
 }
 
 type UserService struct {
@@ -136,6 +137,10 @@ func (s *UserService) AssignRoles(c common.Context, userID uint, newRoleIDs []ui
 
 	tx.Commit()
 	return nil
+}
+
+func (s *UserService) GetPermissions(userID any) ([]string, error) {
+	return s.repo.GetPermissions(userID)
 }
 
 func (s *UserService) generateTokenPair(user entities.User, isRemember bool, iss string) (LoginResponse, error) {

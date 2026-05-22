@@ -215,6 +215,29 @@ func (h *UserHandler) AssignRoles(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(nil, "Roles assigned"))
 }
 
+// GetPermissions godoc
+// @Summary      Get user permissions
+// @Description  Get list of permissions for the authenticated user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  common.JSONResponse{items=[]string}
+// @Failure      401  {object}  common.JSONResponse
+// @Failure      500  {object}  common.JSONResponse
+// @Security     ApiKeyAuth
+// @Router       /v1/users/permissions [get]
+func (h *UserHandler) GetPermissions(c fiber.Ctx) error {
+	claims := common.FiberCtxToClaims(c)
+	id := claims["userId"]
+
+	permissions, err := h.service.GetPermissions(id)
+	if err != nil {
+		return c.Status(common.StatusCodeFromError(err)).JSON(common.NewJSONResponse(err, "failed retrieving permissions"))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(permissions, "Permissions found"))
+}
+
 func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 	users := v1.Group("/users")
 
@@ -223,6 +246,7 @@ func (h *UserHandler) SetupRoutes(v1 fiber.Router) {
 	users.Post("/refresh", middlewares.Refresh(), h.Refresh)
 
 	users.Get("/", middlewares.Authn(), h.Read)
+	users.Get("/permissions", middlewares.Authn(), h.GetPermissions)
 	users.Get("/:id", middlewares.Authn(), h.GetByID)
 
 	users.Put("/:id", middlewares.Authn(), h.Update)
