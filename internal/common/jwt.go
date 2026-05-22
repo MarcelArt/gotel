@@ -53,3 +53,20 @@ func FiberCtxToClaims(c fiber.Ctx) jwt.MapClaims {
 	token := jwtware.FromContext(c)
 	return token.Claims.(jwt.MapClaims)
 }
+
+func ParseToken(tokenStr string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(configs.Env.JwtSecret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, fmt.Errorf("invalid token")
+}
+

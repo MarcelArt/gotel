@@ -1,0 +1,35 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gotel - Premium Hospitality and Operations Portal">
+    <title>{{ if .Title }}{{ .Title }}{{ else }}Gotel{{ end }}</title>
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/public/css/style.css">
+    
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+    
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body hx-boost="true" class="h-full">
+    
+    {{ template "content" . }}
+    
+    <script>
+        // Ensure HTMX handles 401/403/other error codes properly during beforeSwap
+        document.body.addEventListener('htmx:beforeSwap', function(evt) {
+            // Allow 400 and 401 responses to swap content (e.g. to show validation/login errors)
+            if (evt.detail.xhr.status === 400 || evt.detail.xhr.status === 401 || evt.detail.xhr.status === 422) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+        });
+    </script>
+</body>
+</html>
+{{ end }}

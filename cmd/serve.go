@@ -9,6 +9,7 @@ import (
 
 	"github.com/MarcelArt/gotel/internal/configs"
 	v1 "github.com/MarcelArt/gotel/internal/v1"
+	"github.com/MarcelArt/gotel/web"
 	"github.com/gofiber/contrib/v3/swaggerui"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
@@ -52,10 +53,13 @@ to quickly create a Cobra application.`,
 		}))
 
 		v1.SetupRoutes(api)
+		web.SetupRoutes(app)
 
 		port := fmt.Sprintf(":%s", configs.Env.PORT)
 		log.Printf("Listening on port %s", configs.Env.PORT)
-		app.Listen(port)
+		if err := app.Listen(port); err != nil {
+			log.Fatalf("failed starting server: %s", err.Error())
+		}
 	},
 }
 
