@@ -6,12 +6,14 @@ import (
 
 type LocationInput struct {
 	common.InputModel
-	Value     string `gorm:"not null" json:"value"`
-	IsVirtual bool   `gorm:"not null;default:false" json:"isVirtual"`
+	Value       string `gorm:"not null" json:"value"`
+	Description string `json:"description"`
+	IsVirtual   bool   `gorm:"not null;default:false" json:"isVirtual"`
 }
 
 type LocationPage struct {
-	ID        uint   `json:"ID"`
-	Value     string `json:"value"`
-	IsVirtual bool   `json:"isVirtual"`
+	ID          uint   `json:"ID"`
+	Value       string `json:"value"`
+	Description string `json:"description"`
+	IsVirtual   bool   `json:"isVirtual"`
 }
