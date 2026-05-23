@@ -24,7 +24,7 @@ var _ IItemRepo = &ItemRepo{}
 func NewItemRepo(db *gorm.DB) *ItemRepo {
 	return &ItemRepo{
 		db:        db,
-		pageQuery: "SELECT id, code, name, picture, tracking_mode, unit, category_id FROM items",
+		pageQuery: "SELECT id, code, name, picture, tracking_mode, unit, category_id FROM items where deleted_at isnull",
 	}
 }
 

@@ -7,6 +7,7 @@ users {
     password string
 }
 
+// inventories start
 categories {
   id uint pk // gorm.Model
   value string unique // amenities, linen, cleaning supplies
@@ -46,3 +47,4 @@ inventory_transactions.item_id > items.id
 inventory_transactions.from_id > locations.id
 inventory_transactions.to_id > locations.id
 inventory_transactions.actor_id > users.id
+// inventories end
