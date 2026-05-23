@@ -2,6 +2,8 @@ package web
 
 import (
 	"bytes"
+	"fmt"
+	"html"
 	"strconv"
 
 	"github.com/MarcelArt/gotel/internal/v1/features/categories"
@@ -212,4 +214,36 @@ func (h *WebHandler) CategoriesDelete(c fiber.Ctx) error {
 	}
 
 	return h.renderTab(c, "categories", vm)
+}
+
+// CategoriesOptionsGet handles GET /categories/options requests.
+// It returns dropdown item buttons for infinite scrolling of categories.
+func (h *WebHandler) CategoriesOptionsGet(c fiber.Ctx) error {
+	userID := c.Locals("userId")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
+	}
+
+	pageInfo, categoriesList := h.categoryService.Read(c)
+
+	var buf bytes.Buffer
+	for _, cat := range categoriesList {
+		escapedVal := html.EscapeString(cat.Value)
+		buf.WriteString(fmt.Sprintf(`<button type="button" class="dropdown-item" @click="selectedCategoryId = '%d'; selectedCategoryName = '%s'; open = false;">%s</button>`, cat.ID, escapedVal, escapedVal))
+	}
+
+	if !pageInfo.Last {
+		nextPage := pageInfo.Page + 1
+		buf.WriteString(fmt.Sprintf(`
+		<div hx-get="/categories/options?page=%d&size=%d"
+			 hx-trigger="intersect once"
+			 hx-target="this"
+			 hx-swap="outerHTML"
+			 style="padding: 8px; text-align: center; color: var(--color-secondary); font-size: 12px;">
+			 Loading more...
+		</div>`, nextPage, pageInfo.Size))
+	}
+
+	c.Type("html")
+	return c.Send(buf.Bytes())
 }

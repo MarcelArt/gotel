@@ -6,6 +6,7 @@ import (
 
 	"github.com/MarcelArt/gotel/internal/configs"
 	"github.com/MarcelArt/gotel/internal/v1/features/categories"
+	"github.com/MarcelArt/gotel/internal/v1/features/items"
 	"github.com/MarcelArt/gotel/internal/v1/features/locations"
 	"github.com/MarcelArt/gotel/internal/v1/features/roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/user_roles"
@@ -35,13 +36,15 @@ func SetupRoutes(app *fiber.App) {
 	urRepo := user_roles.NewUserRoleRepo(configs.DB)
 	cRepo := categories.NewCategoryRepo(configs.DB)
 	locRepo := locations.NewLocationRepo(configs.DB)
+	itemRepo := items.NewItemRepo(configs.DB)
 
 	uService := users.NewUserService(uRepo, urRepo)
 	rService := roles.NewRoleService(rRepo)
 	cService := categories.NewCategoryService(cRepo)
 	locService := locations.NewLocationService(locRepo)
+	itemService := items.NewItemService(itemRepo)
 
-	h := NewWebHandler(uService, rService, cService, locService)
+	h := NewWebHandler(uService, rService, cService, locService, itemService)
 
 	// Register routes
 	app.Get("/login", h.LoginGet)
@@ -77,6 +80,7 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Get("/categories/:id/edit", h.CategoriesEditGet)
 	authGroup.Put("/categories/:id", h.CategoriesPut)
 	authGroup.Delete("/categories/:id", h.CategoriesDelete)
+	authGroup.Get("/categories/options", h.CategoriesOptionsGet)
 
 	// Locations routes
 	authGroup.Get("/locations", h.LocationsGet)
@@ -85,8 +89,14 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Put("/locations/:id", h.LocationsPut)
 	authGroup.Delete("/locations/:id", h.LocationsDelete)
 
-	// Inventory Placeholders
+	// Items routes
 	authGroup.Get("/items", h.ItemsGet)
+	authGroup.Post("/items", h.ItemsPost)
+	authGroup.Get("/items/:id/edit", h.ItemsEditGet)
+	authGroup.Put("/items/:id", h.ItemsPut)
+	authGroup.Delete("/items/:id", h.ItemsDelete)
+
+	// Inventory Placeholders
 	authGroup.Get("/transactions", h.TransactionsGet)
 
 	authGroup.Get("/settings", h.SettingsGet)

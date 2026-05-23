@@ -28,15 +28,6 @@ func (h *WebHandler) getPlaceholderViewModel(c fiber.Ctx, activeTab string, titl
 	}, nil
 }
 
-// ItemsGet handles GET /items requests.
-func (h *WebHandler) ItemsGet(c fiber.Ctx) error {
-	vm, err := h.getPlaceholderViewModel(c, "items", "Inventory Items")
-	if err != nil {
-		return h.LogoutPost(c)
-	}
-	return h.renderTab(c, "items", vm)
-}
-
 // TransactionsGet handles GET /transactions requests.
 func (h *WebHandler) TransactionsGet(c fiber.Ctx) error {
 	vm, err := h.getPlaceholderViewModel(c, "transactions", "Inventory Transactions")
