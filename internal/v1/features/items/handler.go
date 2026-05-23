@@ -93,10 +93,15 @@ func (h *ItemHandler) Read(c fiber.Ctx) error {
 // @Summary      Update item
 // @Description  Update an existing item's details
 // @Tags         items
-// @Accept       json
+// @Accept       mpfd
 // @Produce      json
-// @Param        id    path      string     true  "Item ID"
-// @Param        item  body      ItemInput  true  "Updated item details"
+// @Param        id            path      string  true   "Item ID"
+// @Param        code          formData  string  true   "Item code"
+// @Param        name          formData  string  true   "Item name"
+// @Param        trackingMode  formData  string  true   "Tracking mode (CONSUMABLE, REUSABLE, SERIALIZED)"
+// @Param        unit          formData  string  true   "Unit"
+// @Param        categoryId    formData  int     true   "Category ID"
+// @Param        file          formData  file    false  "Optional picture file"
 // @Success      200   {object}  common.JSONResponse
 // @Failure      400   {object}  common.JSONResponse
 // @Failure      401   {object}  common.JSONResponse
@@ -105,8 +110,24 @@ func (h *ItemHandler) Read(c fiber.Ctx) error {
 // @Router       /v1/items/{id} [put]
 func (h *ItemHandler) Update(c fiber.Ctx) error {
 	var item ItemInput
-	if err := c.Bind().JSON(&item); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing json"))
+	if err := c.Bind().Form(&item); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing form"))
+	}
+
+	file, _ := c.FormFile("file")
+	if file != nil {
+		today := time.Now().Unix()
+		basePath := "public/uploads"
+		if err := os.MkdirAll(basePath, 0755); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed creating directory"))
+		}
+
+		filename := fmt.Sprintf("./%s/item-%d-%s", basePath, today, file.Filename)
+		if err := c.SaveFile(file, filename); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed saving file"))
+		}
+
+		item.Picture = filename
 	}
 
 	if err := h.service.Update(c, c.Params("id"), item); err != nil {
