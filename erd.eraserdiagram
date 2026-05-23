@@ -1,0 +1,47 @@
+entity-relationship-diagram
+
+users {
+    id uint pk // gorm.Model
+    username string
+    email string
+    password string
+}
+
+categories {
+  id uint pk // gorm.Model
+  value string unique // amenities, linen, cleaning supplies
+}
+
+items {
+  id uint pk // gorm.Model
+  code string unique
+  name string
+  picture string
+  tracking_mode string // CONSUMABLE, REUSABLE, SERIALIZED
+  unit string
+  category_id uint fk
+}
+
+inventory_transactions {
+  id uint pk // gorm.Model
+  transaction_type string
+  quantity float64
+  note string
+  item_id uint fk
+  from_id uint fk null
+  to_id uint fk null
+  actor_id uint fk
+}
+
+locations {
+  id uint pk // gorm.Model
+  value string
+  is_virtual bool
+}
+
+items.category_id > categories.id
+
+inventory_transactions.item_id > items.id
+inventory_transactions.from_id > locations.id
+inventory_transactions.to_id > locations.id
+inventory_transactions.actor_id > users.id
