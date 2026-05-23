@@ -5,6 +5,7 @@ import (
 	"html/template"
 
 	"github.com/MarcelArt/gotel/internal/configs"
+	"github.com/MarcelArt/gotel/internal/v1/features/categories"
 	"github.com/MarcelArt/gotel/internal/v1/features/roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/user_roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/users"
@@ -21,16 +22,23 @@ func SetupRoutes(app *fiber.App) {
 	views["dashboard"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/dashboard_tab.html"))
 	views["roles"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/roles_tab.html"))
 	views["users"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/users_tab.html"))
+	views["categories"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/categories_tab.html"))
+	views["locations"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/locations_tab.html"))
+	views["items"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/items_tab.html"))
+	views["transactions"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/transactions_tab.html"))
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
 
 	// Instantiate services
 	uRepo := users.NewUserRepo(configs.DB)
 	rRepo := roles.NewRoleRepo(configs.DB)
 	urRepo := user_roles.NewUserRoleRepo(configs.DB)
+	cRepo := categories.NewCategoryRepo(configs.DB)
+
 	uService := users.NewUserService(uRepo, urRepo)
 	rService := roles.NewRoleService(rRepo)
+	cService := categories.NewCategoryService(cRepo)
 
-	h := NewWebHandler(uService, rService)
+	h := NewWebHandler(uService, rService, cService)
 
 	// Register routes
 	app.Get("/login", h.LoginGet)
@@ -59,6 +67,18 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Put("/users/:id", h.UsersPut)
 	authGroup.Delete("/users/:id", h.UsersDelete)
 	authGroup.Get("/users/roles/list", h.UserRolesListGet)
+
+	// Categories routes
+	authGroup.Get("/categories", h.CategoriesGet)
+	authGroup.Post("/categories", h.CategoriesPost)
+	authGroup.Get("/categories/:id/edit", h.CategoriesEditGet)
+	authGroup.Put("/categories/:id", h.CategoriesPut)
+	authGroup.Delete("/categories/:id", h.CategoriesDelete)
+
+	// Inventory Placeholders
+	authGroup.Get("/locations", h.LocationsGet)
+	authGroup.Get("/items", h.ItemsGet)
+	authGroup.Get("/transactions", h.TransactionsGet)
 
 	authGroup.Get("/settings", h.SettingsGet)
 }

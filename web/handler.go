@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 
+	"github.com/MarcelArt/gotel/internal/v1/features/categories"
 	"github.com/MarcelArt/gotel/internal/v1/features/roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/users"
 	"github.com/gofiber/fiber/v3"
@@ -12,17 +13,20 @@ import (
 var views = make(map[string]*template.Template)
 
 type WebHandler struct {
-	userService users.IUserService
-	roleService roles.IRoleService
+	userService     users.IUserService
+	roleService     roles.IRoleService
+	categoryService categories.ICategoryService
 }
 
 func NewWebHandler(
 	userService users.IUserService,
 	roleService roles.IRoleService,
+	categoryService categories.ICategoryService,
 ) *WebHandler {
 	return &WebHandler{
-		userService: userService,
-		roleService: roleService,
+		userService:     userService,
+		roleService:     roleService,
+		categoryService: categoryService,
 	}
 }
 

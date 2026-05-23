@@ -10,6 +10,7 @@ users {
 categories {
   id uint pk // gorm.Model
   value string unique // amenities, linen, cleaning supplies
+  description string
 }
 
 items {

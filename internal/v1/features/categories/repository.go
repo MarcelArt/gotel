@@ -24,7 +24,7 @@ var _ ICategoryRepo = &CategoryRepo{}
 func NewCategoryRepo(db *gorm.DB) *CategoryRepo {
 	return &CategoryRepo{
 		db:        db,
-		pageQuery: "SELECT id, value FROM categories",
+		pageQuery: "SELECT id, value, description FROM categories where deleted_at isnull",
 	}
 }
 

@@ -1,0 +1,8 @@
+# Project Rules & Guidelines
+
+- **No Server Execution**: Do not run the Go backend server. Only the USER is allowed to run the server.
+- **No Database Migrations**: Do not execute database migrations. Only the USER is allowed to run migrations.
+- **Strict Separation of Concerns (Backend vs Frontend)**:
+  - If a chat session or request is focused on frontend features (views, HTML templates, CSS, JS, handlers, routers), do not modify or update files under `internal/v1/features/` or other backend repository/service directories.
+  - If a backend change is needed, inform the USER and document it as a recommendation rather than making the change yourself.
+  - Conversely, if a chat session is focused on backend work, only touch backend code and do not modify the web/frontend files.
