@@ -2,6 +2,8 @@ package web
 
 import (
 	"bytes"
+	"fmt"
+	"html"
 	"strconv"
 
 	"github.com/MarcelArt/gotel/internal/v1/features/locations"
@@ -219,4 +221,36 @@ func (h *WebHandler) LocationsDelete(c fiber.Ctx) error {
 	}
 
 	return h.renderTab(c, "locations", vm)
+}
+
+// LocationsOptionsGet handles GET /locations/options requests.
+// It returns dropdown item buttons for infinite scrolling of locations.
+func (h *WebHandler) LocationsOptionsGet(c fiber.Ctx) error {
+	userID := c.Locals("userId")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
+	}
+
+	pageInfo, locationsList := h.locationService.Read(c)
+
+	var buf bytes.Buffer
+	for _, loc := range locationsList {
+		escapedVal := html.EscapeString(loc.Value)
+		buf.WriteString(fmt.Sprintf(`<button type="button" class="dropdown-item" @click="selectedId = '%d'; selectedName = '%s'; open = false;">%s</button>`, loc.ID, escapedVal, escapedVal))
+	}
+
+	if !pageInfo.Last {
+		nextPage := pageInfo.Page + 1
+		buf.WriteString(fmt.Sprintf(`
+		<div hx-get="/locations/options?page=%d&size=%d"
+			 hx-trigger="intersect once"
+			 hx-target="this"
+			 hx-swap="outerHTML"
+			 style="padding: 8px; text-align: center; color: var(--color-secondary); font-size: 12px;">
+			 Loading more...
+		</div>`, nextPage, pageInfo.Size))
+	}
+
+	c.Type("html")
+	return c.Send(buf.Bytes())
 }

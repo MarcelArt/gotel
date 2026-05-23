@@ -5,6 +5,7 @@ import (
 	"html/template"
 
 	"github.com/MarcelArt/gotel/internal/v1/features/categories"
+	"github.com/MarcelArt/gotel/internal/v1/features/inventory_transactions"
 	"github.com/MarcelArt/gotel/internal/v1/features/items"
 	"github.com/MarcelArt/gotel/internal/v1/features/locations"
 	"github.com/MarcelArt/gotel/internal/v1/features/roles"
@@ -15,11 +16,12 @@ import (
 var views = make(map[string]*template.Template)
 
 type WebHandler struct {
-	userService     users.IUserService
-	roleService     roles.IRoleService
-	categoryService categories.ICategoryService
-	locationService locations.ILocationService
-	itemService     items.IItemService
+	userService                 users.IUserService
+	roleService                 roles.IRoleService
+	categoryService             categories.ICategoryService
+	locationService             locations.ILocationService
+	itemService                 items.IItemService
+	inventoryTransactionService inventory_transactions.IInventoryTransactionService
 }
 
 func NewWebHandler(
@@ -28,13 +30,15 @@ func NewWebHandler(
 	categoryService categories.ICategoryService,
 	locationService locations.ILocationService,
 	itemService items.IItemService,
+	inventoryTransactionService inventory_transactions.IInventoryTransactionService,
 ) *WebHandler {
 	return &WebHandler{
-		userService:     userService,
-		roleService:     roleService,
-		categoryService: categoryService,
-		locationService: locationService,
-		itemService:     itemService,
+		userService:                 userService,
+		roleService:                 roleService,
+		categoryService:             categoryService,
+		locationService:             locationService,
+		itemService:                 itemService,
+		inventoryTransactionService: inventoryTransactionService,
 	}
 }
 
