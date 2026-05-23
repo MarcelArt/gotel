@@ -20,6 +20,7 @@ func SetupRoutes(app *fiber.App) {
 	views["register"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/register.html"))
 	views["dashboard"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/dashboard_tab.html"))
 	views["roles"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/roles_tab.html"))
+	views["users"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/users_tab.html"))
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
 
 	// Instantiate services
@@ -43,10 +44,21 @@ func SetupRoutes(app *fiber.App) {
 	// Dashboard and authenticated routes
 	authGroup := app.Group("", WebAuth(uService))
 	authGroup.Get("/", h.DashboardGet)
+	
+	// Roles routes
 	authGroup.Get("/roles", h.RolesGet)
 	authGroup.Post("/roles", h.RolesPost)
 	authGroup.Get("/roles/:id/edit", h.RolesEditGet)
 	authGroup.Put("/roles/:id", h.RolesPut)
 	authGroup.Delete("/roles/:id", h.RolesDelete)
+
+	// Users routes
+	authGroup.Get("/users", h.UsersGet)
+	authGroup.Post("/users", h.UsersPost)
+	authGroup.Get("/users/:id/edit", h.UsersEditGet)
+	authGroup.Put("/users/:id", h.UsersPut)
+	authGroup.Delete("/users/:id", h.UsersDelete)
+	authGroup.Get("/users/roles/list", h.UserRolesListGet)
+
 	authGroup.Get("/settings", h.SettingsGet)
 }

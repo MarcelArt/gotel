@@ -16,7 +16,10 @@ type WebHandler struct {
 	roleService roles.IRoleService
 }
 
-func NewWebHandler(userService users.IUserService, roleService roles.IRoleService) *WebHandler {
+func NewWebHandler(
+	userService users.IUserService,
+	roleService roles.IRoleService,
+) *WebHandler {
 	return &WebHandler{
 		userService: userService,
 		roleService: roleService,

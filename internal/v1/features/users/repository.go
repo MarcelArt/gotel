@@ -15,6 +15,7 @@ type IUserRepo interface {
 	common.IBaseCrudRepo[entities.User, UserInput, UserPage]
 	GetByUsernameOrEmail(c common.Context, usernameOrEmail string) (entities.User, error)
 	GetPermissions(id any) ([]string, error)
+	GetRoles(id any) ([]UserRole, error)
 }
 
 type UserRepo struct {
@@ -26,8 +27,22 @@ var _ IUserRepo = &UserRepo{}
 
 func NewUserRepo(db *gorm.DB) *UserRepo {
 	return &UserRepo{
-		db:        db,
-		pageQuery: "SELECT id, username, email FROM users where deleted_at isnull",
+		db: db,
+		pageQuery: `
+			SELECT 
+				u.id as id, 
+				u.username as username, 
+				u.email as email,
+				json_agg(r."name") as roles
+			FROM users u  
+			left join user_roles ur on u.id = ur.user_id and ur.deleted_at isnull
+			left join roles r on ur.role_id = r.id  and r.deleted_at isnull
+			where u.deleted_at isnull
+			group by
+				u.id,
+				u.username,
+				u.email
+		`,
 	}
 }
 
@@ -114,4 +129,23 @@ func (r *UserRepo) GetPermissions(id any) ([]string, error) {
 	err := json.Unmarshal([]byte(permissionsJSON), &permissions)
 
 	return permissions, err
+}
+
+func (r *UserRepo) GetRoles(id any) ([]UserRole, error) {
+	roles := make([]UserRole, 0)
+
+	query := `
+		select 
+			r.id as id,
+			r."name" as name,
+			r.description as description
+		from user_roles ur 
+		join roles r on ur.role_id = r.id and r.deleted_at isnull
+		where ur.deleted_at isnull
+		and ur.user_id = ?
+	`
+
+	err := r.db.Raw(query, id).Scan(&roles).Error
+
+	return roles, err
 }

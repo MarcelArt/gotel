@@ -19,6 +19,7 @@ type IUserService interface {
 	RegenerateTokenPair(c fiber.Ctx, userID any, isRemember bool) (LoginResponse, error)
 	AssignRoles(c common.Context, userID uint, newRoleIDs []uint) error
 	GetPermissions(userID any) ([]string, error)
+	GetRoles(id any) ([]UserRole, error)
 }
 
 type UserService struct {
@@ -167,4 +168,8 @@ func (s *UserService) generateTokenPair(user entities.User, isRemember bool, iss
 	res.User = user
 
 	return res, nil
+}
+
+func (s *UserService) GetRoles(id any) ([]UserRole, error) {
+	return s.repo.GetRoles(id)
 }
