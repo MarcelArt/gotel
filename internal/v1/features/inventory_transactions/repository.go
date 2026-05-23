@@ -31,6 +31,7 @@ func NewInventoryTransactionRepo(db *gorm.DB) *InventoryTransactionRepo {
 				it.transaction_type as transaction_type,
 				it.quantity as quantity,
 				it.note as note,
+				it.item_id as item_id,
 				i."name" as item,
 				i.unit as unit,
 				u.username as actor,

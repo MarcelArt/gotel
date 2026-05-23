@@ -23,6 +23,7 @@ type InventoryTransactionPage struct {
 	TransactionType string    `json:"transactionType"`
 	Quantity        float64   `json:"quantity"`
 	Note            string    `json:"note"`
+	ItemID          uint      `json:"itemId"`
 	Item            string    `json:"item"`
 	Unit            string    `json:"unit"`
 	Actor           string    `json:"actor"`
