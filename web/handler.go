@@ -5,6 +5,7 @@ import (
 	"html/template"
 
 	"github.com/MarcelArt/gotel/internal/v1/features/categories"
+	"github.com/MarcelArt/gotel/internal/v1/features/locations"
 	"github.com/MarcelArt/gotel/internal/v1/features/roles"
 	"github.com/MarcelArt/gotel/internal/v1/features/users"
 	"github.com/gofiber/fiber/v3"
@@ -16,17 +17,20 @@ type WebHandler struct {
 	userService     users.IUserService
 	roleService     roles.IRoleService
 	categoryService categories.ICategoryService
+	locationService locations.ILocationService
 }
 
 func NewWebHandler(
 	userService users.IUserService,
 	roleService roles.IRoleService,
 	categoryService categories.ICategoryService,
+	locationService locations.ILocationService,
 ) *WebHandler {
 	return &WebHandler{
 		userService:     userService,
 		roleService:     roleService,
 		categoryService: categoryService,
+		locationService: locationService,
 	}
 }
 

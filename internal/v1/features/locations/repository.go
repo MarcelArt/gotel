@@ -24,7 +24,7 @@ var _ ILocationRepo = &LocationRepo{}
 func NewLocationRepo(db *gorm.DB) *LocationRepo {
 	return &LocationRepo{
 		db:        db,
-		pageQuery: "SELECT id, value, is_virtual FROM locations",
+		pageQuery: "SELECT id, value, is_virtual, description FROM locations where deleted_at isnull",
 	}
 }
 
