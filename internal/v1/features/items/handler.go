@@ -1,6 +1,10 @@
 package items
 
 import (
+	"fmt"
+	"os"
+	"time"
+
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/v1/middlewares"
 	"github.com/gofiber/fiber/v3"
@@ -21,9 +25,14 @@ func NewItemHandler(service IItemService) *ItemHandler {
 // @Summary      Create a new item
 // @Description  Create a new item with the provided details
 // @Tags         items
-// @Accept       json
+// @Accept       mpfd
 // @Produce      json
-// @Param        item  body      ItemInput  true  "Item details"
+// @Param        code          formData  string  true   "Item code"
+// @Param        name          formData  string  true   "Item name"
+// @Param        trackingMode  formData  string  true   "Tracking mode (CONSUMABLE, REUSABLE, SERIALIZED)"
+// @Param        unit          formData  string  true   "Unit"
+// @Param        categoryId    formData  int     true   "Category ID"
+// @Param        file          formData  file    false  "Optional picture file"
 // @Success      201   {object}  common.JSONResponse{items=uint}
 // @Failure      400   {object}  common.JSONResponse
 // @Failure      500   {object}  common.JSONResponse
@@ -31,8 +40,24 @@ func NewItemHandler(service IItemService) *ItemHandler {
 // @Router       /v1/items [post]
 func (h *ItemHandler) Create(c fiber.Ctx) error {
 	var item ItemInput
-	if err := c.Bind().JSON(&item); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing json"))
+	if err := c.Bind().Form(&item); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewJSONResponse(err, "failed parsing form"))
+	}
+
+	file, _ := c.FormFile("file")
+	if file != nil {
+		today := time.Now().Unix()
+		basePath := "public/uploads"
+		if err := os.MkdirAll(basePath, 0755); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed creating directory"))
+		}
+
+		filename := fmt.Sprintf("./%s/item-%d-%s", basePath, today, file.Filename)
+		if err := c.SaveFile(file, filename); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed saving file"))
+		}
+
+		item.Picture = filename
 	}
 
 	id, err := h.service.Create(c, item)
