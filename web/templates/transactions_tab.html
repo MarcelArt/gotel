@@ -74,6 +74,80 @@
     .ledger-table tr:hover td {
         background-color: rgba(192, 193, 255, 0.02);
     }
+
+    /* --- Mobile card list --- */
+    .tx-card-list { display: none; }
+    .tx-card {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(185, 200, 222, 0.06);
+    }
+    .tx-card:last-child { border-bottom: none; }
+    .tx-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .tx-card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .tx-card-qty {
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+    }
+    .tx-card-qty .unit {
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--color-secondary);
+    }
+    .tx-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        font-size: 12px;
+        color: var(--color-secondary);
+    }
+    .tx-card-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .tx-card-meta-item svg { flex-shrink: 0; }
+    .tx-card-meta-item strong { color: white; font-weight: 500; }
+    .tx-card-note {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--color-secondary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .tx-empty {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--color-secondary);
+    }
+
+    @media (max-width: 768px) {
+        .ledger-table-wrap { display: none !important; }
+        .tx-card-list { display: block; }
+
+        .ledger-header-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+        }
+        .ledger-image, .ledger-placeholder {
+            width: 56px;
+            height: 56px;
+        }
+        .ledger-header-card h1 { font-size: 17px !important; }
+        .ledger-header-card .body-sm { font-size: 12px !important; }
+    }
     </style>
 
     <!-- Back Button -->
@@ -92,7 +166,7 @@
         </div>
         {{ end }}
         <div style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <h1 class="title-md" style="margin: 0; font-size: 22px;">Stock Ledger: {{ .ItemName }}</h1>
                     <p class="body-sm" style="margin-top: 4px; color: var(--color-secondary);">
@@ -122,13 +196,13 @@
     </div>
     {{ end }}
 
-    <!-- Transactions Table -->
-    <div class="dashboard-card" style="padding: 0; overflow-x: auto;">
+    <!-- Desktop: Transactions Table -->
+    <div class="dashboard-card ledger-table-wrap" style="padding: 0; overflow-x: auto;">
         <table class="ledger-table">
             <thead>
                 <tr>
                     <th style="width: 80px;">TX ID</th>
-                    <th>Date & Time</th>
+                    <th>Date &amp; Time</th>
                     <th>Type</th>
                     <th style="text-align: right;">Quantity</th>
                     <th>Route / Locations</th>
@@ -173,6 +247,55 @@
                 {{ end }}
             </tbody>
         </table>
+    </div>
+
+    <!-- Mobile: Transactions Card List -->
+    <div class="dashboard-card tx-card-list" style="padding: 0;">
+        {{ range .Transactions }}
+        <div class="tx-card">
+            <div class="tx-card-header">
+                <div class="tx-card-header-left">
+                    {{ if or (eq .TransactionType "RECEIVE") (eq .TransactionType "LAUNDRY_IN") }}
+                    <span class="badge" style="background-color: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; padding: 2px 8px;">{{ .TransactionType }}</span>
+                    {{ else if eq .TransactionType "TRANSFER" }}
+                    <span class="badge" style="background-color: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 11px; padding: 2px 8px;">{{ .TransactionType }}</span>
+                    {{ else if or (eq .TransactionType "DAMAGE") (eq .TransactionType "LOST") (eq .TransactionType "DISPOSE") }}
+                    <span class="badge" style="background-color: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 11px; padding: 2px 8px;">{{ .TransactionType }}</span>
+                    {{ else }}
+                    <span class="badge" style="background-color: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 11px; padding: 2px 8px;">{{ .TransactionType }}</span>
+                    {{ end }}
+                    <span style="font-family: monospace; font-size: 11px; color: var(--color-secondary);">#{{ .ID }}</span>
+                </div>
+                <div class="tx-card-qty">
+                    {{ if or (eq .TransactionType "RECEIVE") (eq .TransactionType "LAUNDRY_IN") }}+{{ end }}{{ .Quantity }} <span class="unit">{{ .Unit }}</span>
+                </div>
+            </div>
+            <div class="tx-card-meta">
+                <span class="tx-card-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    {{ .CreatedAt }}
+                </span>
+                {{ if .Route }}
+                <span class="tx-card-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <strong>{{ .Route }}</strong>
+                </span>
+                {{ end }}
+                <span class="tx-card-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <strong>{{ .Actor }}</strong>
+                </span>
+            </div>
+            {{ if .Note }}
+            <div class="tx-card-note">{{ .Note }}</div>
+            {{ end }}
+        </div>
+        {{ else }}
+        <div class="tx-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(185, 200, 222, 0.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto;"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="14" x2="14" y2="14"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            No stock movement logs found for this item.
+        </div>
+        {{ end }}
     </div>
 
     <!-- Pagination Controls -->
