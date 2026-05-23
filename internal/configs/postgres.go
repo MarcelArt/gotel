@@ -41,6 +41,10 @@ func MigrateDB() error {
 		entities.User{},
 		entities.Role{},
 		entities.UserRole{},
+		entities.Category{},
+		entities.Item{},
+		entities.Location{},
+		entities.InventoryTransaction{},
 	)
 	fmt.Println("Database Migrated")
 
@@ -53,6 +57,10 @@ func DropDB() error {
 		entities.User{},
 		entities.Role{},
 		entities.UserRole{},
+		entities.Category{},
+		entities.Item{},
+		entities.Location{},
+		entities.InventoryTransaction{},
 	)
 	fmt.Println("Database Dropped")
 
