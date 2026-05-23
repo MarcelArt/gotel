@@ -1,6 +1,8 @@
 package inventory_transactions
 
 import (
+	"time"
+
 	"github.com/MarcelArt/gotel/internal/common"
 )
 
@@ -16,12 +18,14 @@ type InventoryTransactionInput struct {
 }
 
 type InventoryTransactionPage struct {
-	ID              uint    `json:"ID"`
-	TransactionType string  `json:"transactionType"`
-	Quantity        float64 `json:"quantity"`
-	Note            string  `json:"note"`
-	ItemID          uint    `json:"itemId"`
-	FromID          *uint   `json:"fromId"`
-	ToID            *uint   `json:"toId"`
-	ActorID         uint    `json:"actorId"`
+	ID              uint      `json:"ID"`
+	CreatedAt       time.Time `json:"createdAt"`
+	TransactionType string    `json:"transactionType"`
+	Quantity        float64   `json:"quantity"`
+	Note            string    `json:"note"`
+	Item            string    `json:"item"`
+	Unit            string    `json:"unit"`
+	Actor           string    `json:"actor"`
+	From            string    `json:"from"`
+	To              string    `json:"to"`
 }

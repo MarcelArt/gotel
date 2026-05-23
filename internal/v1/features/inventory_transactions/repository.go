@@ -23,8 +23,26 @@ var _ IInventoryTransactionRepo = &InventoryTransactionRepo{}
 
 func NewInventoryTransactionRepo(db *gorm.DB) *InventoryTransactionRepo {
 	return &InventoryTransactionRepo{
-		db:        db,
-		pageQuery: "SELECT id, transaction_type, quantity, note, item_id, from_id, to_id, actor_id FROM inventory_transactions",
+		db: db,
+		pageQuery: `
+			select 
+				it.id as id,
+				it.created_at as created_at,
+				it.transaction_type as transaction_type,
+				it.quantity as quantity,
+				it.note as note,
+				i."name" as item,
+				i.unit as unit,
+				u.username as actor,
+				lf.value as from,
+				lt.value as to
+			from inventory_transactions it 
+			join items i on it.item_id = i.id 
+			join users u on it.actor_id = u.id 
+			left join locations lf on it.from_id = lf.id 
+			left join locations lt on it.to_id = lt.id
+			where it.deleted_at isnull
+		`,
 	}
 }
 
