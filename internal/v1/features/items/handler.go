@@ -52,8 +52,8 @@ func (h *ItemHandler) Create(c fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed creating directory"))
 		}
 
-		filename := fmt.Sprintf("./%s/item-%d-%s", basePath, today, file.Filename)
-		if err := c.SaveFile(file, filename); err != nil {
+		filename := fmt.Sprintf("/%s/item-%d-%s", basePath, today, file.Filename)
+		if err := c.SaveFile(file, fmt.Sprintf(".%s", filename)); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed saving file"))
 		}
 
@@ -122,8 +122,8 @@ func (h *ItemHandler) Update(c fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed creating directory"))
 		}
 
-		filename := fmt.Sprintf("./%s/item-%d-%s", basePath, today, file.Filename)
-		if err := c.SaveFile(file, filename); err != nil {
+		filename := fmt.Sprintf("/%s/item-%d-%s", basePath, today, file.Filename)
+		if err := c.SaveFile(file, fmt.Sprintf(".%s", filename)); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(common.NewJSONResponse(err, "failed saving file"))
 		}
 
