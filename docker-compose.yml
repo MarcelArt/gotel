@@ -1,0 +1,17 @@
+services:
+  aimas:
+    image: marcelaritonang/gotel:latest
+    pull_policy: always
+    container_name: aimas
+    ports:
+      - 7001:7001
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - internet
+
+networks:
+  internet:
+    name: internet
+    external: true
