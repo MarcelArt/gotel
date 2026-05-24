@@ -1,0 +1,26 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Environment and secrets
+.env
+.env.*
+
+# Local development and hot-reload files
+tmp/
+bin/
+obj/
+.agents/
+.cursorrules
+
+# Documentation and design diagrams (we will copy docs/swagger.json during build if needed, but we can copy it from build context or let build stage copy it. So let's not ignore docs completely)
+erd.eraserdiagram
+DESIGN.md
+AGENTS.md
+LICENSE
+README.md
+Makefile
+
+# Uploaded assets (dynamic runtime files)
+public/uploads/*
