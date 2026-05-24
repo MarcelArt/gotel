@@ -8,7 +8,7 @@
     <title>{{ if .Title }}{{ .Title }}{{ else }}Gotel{{ end }}</title>
     
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="/public/css/style.css?v=1.0.2">
+    <link rel="stylesheet" href="/public/css/style.css?v=1.0.3">
     
     <!-- HTMX -->
     <script src="/public/scripts/htmx.min.js"></script>
@@ -17,6 +17,10 @@
     <script defer src="/public/scripts/alpine.min.js"></script>
 </head>
 <body hx-boost="true" class="h-full">
+    <!-- Global Top Progress Bar Indicator (GitHub Style) -->
+    <div id="top-progress-bar" class="top-progress-bar">
+        <div id="top-progress-bar-inner" class="top-progress-bar-inner"></div>
+    </div>
     
     {{ template "content" . }}
     
@@ -29,6 +33,69 @@
                 evt.detail.isError = false;
             }
         });
+
+        // GitHub-style top progress bar logic
+        (function() {
+            let progressBar = document.getElementById('top-progress-bar');
+            let progressInner = document.getElementById('top-progress-bar-inner');
+            let progressTimer;
+            let currentProgress = 0;
+
+            document.body.addEventListener('htmx:beforeRequest', function(evt) {
+                // Ensure elements are resolved
+                if (!progressBar || !progressInner) {
+                    progressBar = document.getElementById('top-progress-bar');
+                    progressInner = document.getElementById('top-progress-bar-inner');
+                }
+                if (!progressBar || !progressInner) return;
+
+                // Reset and show progress bar
+                clearInterval(progressTimer);
+                currentProgress = 0;
+                progressInner.style.transition = 'none';
+                progressInner.style.width = '0%';
+                progressBar.style.opacity = '1';
+
+                // Force reflow to register reset immediately
+                progressBar.offsetWidth;
+
+                // Smooth cubic-bezier transition for natural loading feel
+                progressInner.style.transition = 'width 0.4s cubic-bezier(0.1, 0.8, 0.3, 1)';
+                
+                // Immediately jump to 20% to show activity
+                currentProgress = 20;
+                progressInner.style.width = currentProgress + '%';
+
+                // Slowly increment the progress bar towards 85%
+                progressTimer = setInterval(function() {
+                    if (currentProgress < 85) {
+                        currentProgress += Math.random() * 5 + 1; // Increment by 1-6%
+                        if (currentProgress > 85) currentProgress = 85;
+                        progressInner.style.width = currentProgress + '%';
+                    }
+                }, 300);
+            });
+
+            document.body.addEventListener('htmx:afterRequest', function() {
+                if (!progressBar || !progressInner) return;
+                clearInterval(progressTimer);
+
+                // Quick transition to 100%
+                progressInner.style.transition = 'width 0.2s ease-out';
+                progressInner.style.width = '100%';
+
+                // Fade out after completion
+                setTimeout(function() {
+                    progressBar.style.opacity = '0';
+                }, 250);
+            });
+
+            // Handle network send errors by hiding the bar
+            document.body.addEventListener('htmx:sendError', function() {
+                clearInterval(progressTimer);
+                if (progressBar) progressBar.style.opacity = '0';
+            });
+        })();
     </script>
 </body>
 </html>
