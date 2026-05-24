@@ -168,6 +168,7 @@ func (h *WebHandler) InventoryTransactionsPost(c fiber.Ctx) error {
 
 	quantity, err := strconv.ParseFloat(quantityStr, 64)
 	if err != nil {
+		c.Request().Header.SetMethod(fiber.MethodGet)
 		c.Request().URI().QueryArgs().Set("filters", `[["item_id", "=", "`+itemIDStr+`"]]`)
 		vm, _ := h.getInventoryTransactionsViewModel(c, userID, uint(itemID))
 		vm.Error = "Invalid quantity value"
@@ -215,6 +216,7 @@ func (h *WebHandler) InventoryTransactionsPost(c fiber.Ctx) error {
 
 	_, createErr := h.inventoryTransactionService.Create(c, input)
 
+	c.Request().Header.SetMethod(fiber.MethodGet)
 	c.Request().URI().QueryArgs().Set("filters", `[["item_id", "=", "`+itemIDStr+`"]]`)
 	c.Request().URI().QueryArgs().Set("sort", "-id")
 	vm, err := h.getInventoryTransactionsViewModel(c, userID, uint(itemID))
