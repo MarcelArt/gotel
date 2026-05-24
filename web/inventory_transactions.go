@@ -104,9 +104,10 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 
 	return InventoryTransactionsViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Stock Ledger: " + item.Name + " - Gotel",
-			ActiveTab: "items", // Keeps Items sidebar highlighted
-			User:      currentUser,
+			Title:       "Stock Ledger: " + item.Name + " - Gotel",
+			ActiveTab:   "items", // Keeps Items sidebar highlighted
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 		Transactions: webTxs,
 		Pagination:   pagination,

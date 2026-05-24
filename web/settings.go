@@ -21,9 +21,10 @@ func (h *WebHandler) SettingsGet(c fiber.Ctx) error {
 
 	vm := SettingsViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Settings - Gotel",
-			ActiveTab: "settings",
-			User:      user,
+			Title:       "Settings - Gotel",
+			ActiveTab:   "settings",
+			User:        user,
+			Permissions: getPermissions(c),
 		},
 	}
 

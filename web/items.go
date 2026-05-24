@@ -84,9 +84,10 @@ func (h *WebHandler) getItemsViewModel(c fiber.Ctx, userID any) (ItemsViewModel,
 
 	return ItemsViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Items Catalog - Gotel",
-			ActiveTab: "items",
-			User:      currentUser,
+			Title:       "Items Catalog - Gotel",
+			ActiveTab:   "items",
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 		Items:      webItems,
 		Pagination: pagination,

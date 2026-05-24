@@ -31,6 +31,7 @@ func SetupRoutes(app *fiber.App) {
 	views["transactions"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/transactions_tab.html"))
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
 	views["licenses"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/licenses_tab.html"))
+	views["unauthorized"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/unauthorized_tab.html"))
 
 	// Instantiate services
 	uRepo := users.NewUserRepo(configs.DB)
@@ -64,46 +65,46 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Get("/", h.DashboardGet)
 	
 	// Roles routes
-	authGroup.Get("/roles", h.RolesGet)
-	authGroup.Post("/roles", h.RolesPost)
-	authGroup.Get("/roles/:id/edit", h.RolesEditGet)
-	authGroup.Put("/roles/:id", h.RolesPut)
-	authGroup.Delete("/roles/:id", h.RolesDelete)
-
+	authGroup.Get("/roles", h.WebAuthz("roles#read"), h.RolesGet)
+	authGroup.Post("/roles", h.WebAuthz("roles#create"), h.RolesPost)
+	authGroup.Get("/roles/:id/edit", h.WebAuthz("roles#update"), h.RolesEditGet)
+	authGroup.Put("/roles/:id", h.WebAuthz("roles#update"), h.RolesPut)
+	authGroup.Delete("/roles/:id", h.WebAuthz("roles#delete"), h.RolesDelete)
+	
 	// Users routes
-	authGroup.Get("/users", h.UsersGet)
-	authGroup.Post("/users", h.UsersPost)
-	authGroup.Get("/users/:id/edit", h.UsersEditGet)
-	authGroup.Put("/users/:id", h.UsersPut)
-	authGroup.Delete("/users/:id", h.UsersDelete)
-	authGroup.Get("/users/roles/list", h.UserRolesListGet)
-
+	authGroup.Get("/users", h.WebAuthz("users#read"), h.UsersGet)
+	authGroup.Post("/users", h.WebAuthz("users#create"), h.UsersPost)
+	authGroup.Get("/users/:id/edit", h.WebAuthz("users#update"), h.UsersEditGet)
+	authGroup.Put("/users/:id", h.WebAuthz("users#update"), h.UsersPut)
+	authGroup.Delete("/users/:id", h.WebAuthz("users#delete"), h.UsersDelete)
+	authGroup.Get("/users/roles/list", h.WebAuthz("users#read"), h.UserRolesListGet)
+	
 	// Categories routes
-	authGroup.Get("/categories", h.CategoriesGet)
-	authGroup.Post("/categories", h.CategoriesPost)
-	authGroup.Get("/categories/:id/edit", h.CategoriesEditGet)
-	authGroup.Put("/categories/:id", h.CategoriesPut)
-	authGroup.Delete("/categories/:id", h.CategoriesDelete)
-	authGroup.Get("/categories/options", h.CategoriesOptionsGet)
-
+	authGroup.Get("/categories", h.WebAuthz("categories#read"), h.CategoriesGet)
+	authGroup.Post("/categories", h.WebAuthz("categories#create"), h.CategoriesPost)
+	authGroup.Get("/categories/:id/edit", h.WebAuthz("categories#update"), h.CategoriesEditGet)
+	authGroup.Put("/categories/:id", h.WebAuthz("categories#update"), h.CategoriesPut)
+	authGroup.Delete("/categories/:id", h.WebAuthz("categories#delete"), h.CategoriesDelete)
+	authGroup.Get("/categories/options", h.WebAuthz("categories#read"), h.CategoriesOptionsGet)
+	
 	// Locations routes
-	authGroup.Get("/locations", h.LocationsGet)
-	authGroup.Post("/locations", h.LocationsPost)
-	authGroup.Get("/locations/:id/edit", h.LocationsEditGet)
-	authGroup.Put("/locations/:id", h.LocationsPut)
-	authGroup.Delete("/locations/:id", h.LocationsDelete)
-	authGroup.Get("/locations/options", h.LocationsOptionsGet)
-
+	authGroup.Get("/locations", h.WebAuthz("locations#read"), h.LocationsGet)
+	authGroup.Post("/locations", h.WebAuthz("locations#create"), h.LocationsPost)
+	authGroup.Get("/locations/:id/edit", h.WebAuthz("locations#update"), h.LocationsEditGet)
+	authGroup.Put("/locations/:id", h.WebAuthz("locations#update"), h.LocationsPut)
+	authGroup.Delete("/locations/:id", h.WebAuthz("locations#delete"), h.LocationsDelete)
+	authGroup.Get("/locations/options", h.WebAuthz("locations#read"), h.LocationsOptionsGet)
+	
 	// Items routes
-	authGroup.Get("/items", h.ItemsGet)
-	authGroup.Post("/items", h.ItemsPost)
-	authGroup.Get("/items/:id/edit", h.ItemsEditGet)
-	authGroup.Put("/items/:id", h.ItemsPut)
-	authGroup.Delete("/items/:id", h.ItemsDelete)
-
+	authGroup.Get("/items", h.WebAuthz("items#read"), h.ItemsGet)
+	authGroup.Post("/items", h.WebAuthz("items#create"), h.ItemsPost)
+	authGroup.Get("/items/:id/edit", h.WebAuthz("items#update"), h.ItemsEditGet)
+	authGroup.Put("/items/:id", h.WebAuthz("items#update"), h.ItemsPut)
+	authGroup.Delete("/items/:id", h.WebAuthz("items#delete"), h.ItemsDelete)
+	
 	// Inventory Transactions routes
-	authGroup.Get("/inventory-transactions", h.InventoryTransactionsGet)
-	authGroup.Post("/inventory-transactions", h.InventoryTransactionsPost)
+	authGroup.Get("/inventory-transactions", h.WebAuthz("inventoryTransactions#read"), h.InventoryTransactionsGet)
+	authGroup.Post("/inventory-transactions", h.WebAuthz("inventoryTransactions#create"), h.InventoryTransactionsPost)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)

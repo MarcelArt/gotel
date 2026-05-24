@@ -60,9 +60,10 @@ func (h *WebHandler) getCategoriesViewModel(c fiber.Ctx, userID any) (Categories
 
 	return CategoriesViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Categories Management - Gotel",
-			ActiveTab: "categories",
-			User:      currentUser,
+			Title:       "Categories Management - Gotel",
+			ActiveTab:   "categories",
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 		Categories: webCategories,
 		Pagination: pagination,

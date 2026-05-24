@@ -184,9 +184,10 @@ func (h *WebHandler) LicensesGet(c fiber.Ctx) error {
 
 	vm := LicensesViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Attribution Licenses - Gotel",
-			ActiveTab: "licenses",
-			User:      user,
+			Title:       "Attribution Licenses - Gotel",
+			ActiveTab:   "licenses",
+			User:        user,
+			Permissions: getPermissions(c),
 		},
 		Licenses: licenses,
 		Error:    errMsg,

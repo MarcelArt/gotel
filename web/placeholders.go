@@ -21,9 +21,10 @@ func (h *WebHandler) getPlaceholderViewModel(c fiber.Ctx, activeTab string, titl
 
 	return PlaceholderViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     title + " - Gotel",
-			ActiveTab: activeTab,
-			User:      currentUser,
+			Title:       title + " - Gotel",
+			ActiveTab:   activeTab,
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 	}, nil
 }

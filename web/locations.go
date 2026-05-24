@@ -62,9 +62,10 @@ func (h *WebHandler) getLocationsViewModel(c fiber.Ctx, userID any) (LocationsVi
 
 	return LocationsViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Locations Directory - Gotel",
-			ActiveTab: "locations",
-			User:      currentUser,
+			Title:       "Locations Directory - Gotel",
+			ActiveTab:   "locations",
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 		Locations:  webLocations,
 		Pagination: pagination,

@@ -21,14 +21,41 @@ type PermissionDefinition struct {
 
 var AvailablePermissions = []PermissionDefinition{
 	{enums.PermFullAccess, "Full Access", "Grant all permissions to the operator"},
+
 	{"roles#create", "Create Roles", "Allows creating new roles"},
 	{"roles#read", "Read Roles", "Allows listing and viewing roles"},
 	{"roles#update", "Update Roles", "Allows updating roles"},
 	{"roles#delete", "Delete Roles", "Allows deleting roles"},
+
 	{"users#create", "Create Users", "Allows creating new users"},
 	{"users#read", "Read Users", "Allows listing and viewing users"},
 	{"users#update", "Update Users", "Allows assigning roles to users"},
 	{"users#delete", "Delete Users", "Allows deleting users"},
+
+	{"userRoles#create", "Create User Roles", "Allows creating new user roles"},
+	{"userRoles#read", "Read User Roles", "Allows listing and viewing user roles"},
+	{"userRoles#update", "Update User Roles", "Allows updating user roles"},
+	{"userRoles#delete", "Delete User Roles", "Allows deleting user roles"},
+
+	{"categories#create", "Create Categories", "Allows creating new categories"},
+	{"categories#read", "Read Categories", "Allows listing and viewing categories"},
+	{"categories#update", "Update Categories", "Allows updating categories"},
+	{"categories#delete", "Delete Categories", "Allows deleting categories"},
+
+	{"locations#create", "Create Locations", "Allows creating new locations"},
+	{"locations#read", "Read Locations", "Allows listing and viewing locations"},
+	{"locations#update", "Update Locations", "Allows updating locations"},
+	{"locations#delete", "Delete Locations", "Allows deleting locations"},
+
+	{"items#create", "Create Items", "Allows creating new items"},
+	{"items#read", "Read Items", "Allows listing and viewing items"},
+	{"items#update", "Update Items", "Allows updating items"},
+	{"items#delete", "Delete Items", "Allows deleting items"},
+
+	{"inventoryTransactions#create", "Create Inventory Transactions", "Allows creating new inventory transactions"},
+	{"inventoryTransactions#read", "Read Inventory Transactions", "Allows listing and viewing inventory transactions"},
+	{"inventoryTransactions#update", "Update Inventory Transactions", "Allows updating inventory transactions"},
+	{"inventoryTransactions#delete", "Delete Inventory Transactions", "Allows deleting inventory transactions"},
 }
 
 type RoleWebViewModel struct {
@@ -101,9 +128,10 @@ func (h *WebHandler) getRolesViewModel(c fiber.Ctx, userID any) (RolesViewModel,
 
 	return RolesViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Roles Management - Gotel",
-			ActiveTab: "roles",
-			User:      user,
+			Title:       "Roles Management - Gotel",
+			ActiveTab:   "roles",
+			User:        user,
+			Permissions: getPermissions(c),
 		},
 		Roles:                webRoles,
 		AvailablePermissions: AvailablePermissions,

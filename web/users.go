@@ -63,9 +63,10 @@ func (h *WebHandler) getUsersViewModel(c fiber.Ctx, userID any) (UsersViewModel,
 
 	return UsersViewModel{
 		BaseViewModel: BaseViewModel{
-			Title:     "Users Management - Gotel",
-			ActiveTab: "users",
-			User:      currentUser,
+			Title:       "Users Management - Gotel",
+			ActiveTab:   "users",
+			User:        currentUser,
+			Permissions: getPermissions(c),
 		},
 		Users:      webUsers,
 		Pagination: pagination,
