@@ -24,6 +24,8 @@ services:
         condition: service_completed_successfully
     networks:
       - internet
+    volumes:
+      - ./public/uploads:/app/public/uploads
 
 networks:
   internet:
