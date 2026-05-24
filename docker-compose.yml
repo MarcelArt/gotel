@@ -1,13 +1,27 @@
 services:
-  aimas:
+  gotel-db-migration:
     image: marcelaritonang/gotel:latest
     pull_policy: always
-    container_name: aimas
+    container_name: gotel-db-migration
+    command: ["migrate"]
+    env_file:
+      - .env
+    restart: "no"
+    networks:
+      - internet
+
+  gotel:
+    image: marcelaritonang/gotel:latest
+    pull_policy: always
+    container_name: gotel
     ports:
       - 7001:7001
     env_file:
       - .env
     restart: unless-stopped
+    depends_on:
+      gotel-db-migration:
+        condition: service_completed_successfully
     networks:
       - internet
 
