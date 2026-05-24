@@ -31,6 +31,7 @@ type InventoryTransactionsViewModel struct {
 	ItemCode     string
 	ItemUnit     string
 	ItemPicture  string
+	ItemCounts   []inventory_transactions.ItemCount
 	Error        string
 	Success      string
 }
@@ -102,6 +103,11 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 		PrevPage:    prevPage,
 	}
 
+	itemCounts, err := h.inventoryTransactionService.GetItemCounts(itemID)
+	if err != nil {
+		itemCounts = []inventory_transactions.ItemCount{}
+	}
+
 	return InventoryTransactionsViewModel{
 		BaseViewModel: BaseViewModel{
 			Title:       "Stock Ledger: " + item.Name + " - Gotel",
@@ -116,6 +122,7 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 		ItemCode:     item.Code,
 		ItemUnit:     item.Unit,
 		ItemPicture:  item.Picture,
+		ItemCounts:   itemCounts,
 	}, nil
 }
 
