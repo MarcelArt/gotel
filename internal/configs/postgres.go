@@ -2,9 +2,12 @@ package configs
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/MarcelArt/gotel/internal/entities"
+	"github.com/MarcelArt/gotel/internal/enums"
+	"github.com/MarcelArt/gotel/pkg/jsonb"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -48,6 +51,9 @@ func MigrateDB() error {
 	)
 	fmt.Println("Database Migrated")
 
+	seedDefaultUser()
+	fmt.Println("Default User Seeded")
+
 	return err
 }
 
@@ -65,4 +71,30 @@ func DropDB() error {
 	fmt.Println("Database Dropped")
 
 	return err
+}
+
+func seedDefaultUser() {
+	user := entities.User{
+		Username: Env.DefaultUser,
+		Email:    Env.DefaultEmail,
+		Password: Env.DefaultPassword,
+	}
+	DB.Where("username = ?", user.Username).FirstOrCreate(&user)
+
+	permissions, err := jsonb.New([]string{enums.PermFullAccess})
+	if err != nil {
+		log.Fatalf("failed seeding role: %s", err.Error())
+	}
+
+	role := entities.Role{
+		Name:        "Admin",
+		Permissions: permissions,
+	}
+	DB.Where("name = ?", role.Name).FirstOrCreate(&role)
+
+	userRole := entities.UserRole{
+		UserID: user.ID,
+		RoleID: role.ID,
+	}
+	DB.Where("role_id = ? and user_id = ?", role.ID, user.ID).FirstOrCreate(&userRole)
 }
