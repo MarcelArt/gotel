@@ -51,11 +51,13 @@ func (s *UserService) Read(c fiber.Ctx) (paginate.Page, []UserPage) {
 }
 
 func (s *UserService) Update(c common.Context, id any, input UserInput) error {
-	password, err := argon2id.CreateHash(input.Password, argon2id.DefaultParams)
-	if err != nil {
-		return fmt.Errorf("failed to hash password: %w", err)
+	if input.Password != "" {
+		password, err := argon2id.CreateHash(input.Password, argon2id.DefaultParams)
+		if err != nil {
+			return fmt.Errorf("failed to hash password: %w", err)
+		}
+		input.Password = password
 	}
-	input.Password = password
 
 	return s.repo.Update(c, id, input)
 }

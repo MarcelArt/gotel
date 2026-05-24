@@ -78,6 +78,7 @@ func (r *UserRepo) Update(c common.Context, id any, input UserInput) error {
 	if err != nil {
 		return fmt.Errorf("cannot cast input: %w", err)
 	}
+	user.Password = input.Password
 
 	_, err = gorm.G[entities.User](r.db).Where("id = ?", id).Updates(ctx, user)
 

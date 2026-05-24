@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"strconv"
 
-	"github.com/MarcelArt/gotel/internal/configs"
-	"github.com/MarcelArt/gotel/internal/entities"
 	"github.com/MarcelArt/gotel/internal/v1/features/users"
 	"github.com/gofiber/fiber/v3"
 )
@@ -197,25 +195,12 @@ func (h *WebHandler) UsersPut(c fiber.Ctx) error {
 
 	var updateErr error
 	if username != "" && email != "" {
-		existingUser, err := h.userService.GetByID(c, uint(id))
-		if err == nil {
-			userInput := users.UserInput{
-				Username: username,
-				Email:    email,
-			}
-			if password != "" {
-				userInput.Password = password
-				updateErr = h.userService.Update(c, uint(id), userInput)
-			} else {
-				// Avoid double hashing: update username and email directly using GORM
-				updateErr = configs.DB.Model(&entities.User{}).Where("id = ?", existingUser.ID).Updates(map[string]any{
-					"username": username,
-					"email":    email,
-				}).Error
-			}
-		} else {
-			updateErr = err
+		userInput := users.UserInput{
+			Username: username,
+			Email:    email,
+			Password: password,
 		}
+		updateErr = h.userService.Update(c, uint(id), userInput)
 	}
 
 	vm, err := h.getUsersViewModel(c, userID)
