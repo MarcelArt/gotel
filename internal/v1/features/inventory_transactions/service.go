@@ -1,6 +1,8 @@
 package inventory_transactions
 
 import (
+	"fmt"
+
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/entities"
 	"github.com/gofiber/fiber/v3"
@@ -9,6 +11,7 @@ import (
 
 type IInventoryTransactionService interface {
 	common.IBaseCrudService[entities.InventoryTransaction, InventoryTransactionInput, InventoryTransactionPage]
+	GetItemCounts(itemID any) ([]ItemCount, error)
 }
 
 type InventoryTransactionService struct {
@@ -41,4 +44,24 @@ func (s *InventoryTransactionService) Delete(c common.Context, id any) error {
 
 func (s *InventoryTransactionService) GetByID(c common.Context, id any) (entities.InventoryTransaction, error) {
 	return s.repo.GetByID(c, id)
+}
+
+func (s *InventoryTransactionService) GetItemCounts(itemID any) ([]ItemCount, error) {
+	itemCounts, err := s.repo.GetItemCounts(itemID)
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving item counts: %w", err)
+	}
+
+	actualQuantity := ItemCount{TransactionType: "ACTUAL"}
+	for _, itemCount := range itemCounts {
+		if itemCount.TransactionType == "RECEIVE" {
+			actualQuantity.Quantity += itemCount.Quantity
+		} else {
+			actualQuantity.Quantity -= itemCount.Quantity
+		}
+	}
+
+	itemCounts = append(itemCounts, actualQuantity)
+
+	return itemCounts, nil
 }

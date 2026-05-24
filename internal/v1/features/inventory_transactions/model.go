@@ -30,3 +30,8 @@ type InventoryTransactionPage struct {
 	From            string    `json:"from"`
 	To              string    `json:"to"`
 }
+
+type ItemCount struct {
+	TransactionType string  `json:"transactionType"`
+	Quantity        float64 `json:"quantity"`
+}

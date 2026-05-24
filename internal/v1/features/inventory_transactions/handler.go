@@ -132,14 +132,41 @@ func (h *InventoryTransactionHandler) GetByID(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(tx, "Inventory transaction found"))
 }
 
+// GetItemCounts godoc
+// @Summary      Get item counts
+// @Description  Get aggregated transaction counts (by transaction type) for a specific item
+// @Tags         inventory-transactions
+// @Accept       json
+// @Produce      json
+// @Param        item_id  path      int  true  "Item ID"
+// @Success      200      {object}  common.JSONResponse{items=[]ItemCount}
+// @Failure      400      {object}  common.JSONResponse
+// @Failure      401      {object}  common.JSONResponse
+// @Failure      500      {object}  common.JSONResponse
+// @Security     ApiKeyAuth
+// @Router       /v1/inventory-transactions/item-counts/{item_id} [get]
+func (h *InventoryTransactionHandler) GetItemCounts(c fiber.Ctx) error {
+	itemID := fiber.Params[uint](c, "item_id")
+
+	counts, err := h.service.GetItemCounts(itemID)
+	if err != nil {
+		return c.Status(common.StatusCodeFromError(err)).JSON(common.NewJSONResponse(err, "failed getting item counts"))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewJSONResponse(counts, "Item counts found"))
+}
+
 func (h *InventoryTransactionHandler) SetupRoutes(v1 fiber.Router) {
 	txs := v1.Group("/inventory-transactions")
 
 	txs.Use(middlewares.Authn())
 
 	txs.Post("/", middlewares.Authz("inventoryTransactions#create"), h.Create)
+
 	txs.Get("/", middlewares.Authz("inventoryTransactions#read"), h.Read)
+	txs.Get("/item-counts/:item_id", middlewares.Authz("inventoryTransactions#read"), h.GetItemCounts)
 	txs.Get("/:id", middlewares.Authz("inventoryTransactions#read"), h.GetByID)
+
 	txs.Put("/:id", middlewares.Authz("inventoryTransactions#update"), h.Update)
 	txs.Delete("/:id", middlewares.Authz("inventoryTransactions#delete"), h.Delete)
 }

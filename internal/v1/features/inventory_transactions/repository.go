@@ -12,6 +12,7 @@ import (
 
 type IInventoryTransactionRepo interface {
 	common.IBaseCrudRepo[entities.InventoryTransaction, InventoryTransactionInput, InventoryTransactionPage]
+	GetItemCounts(itemID any) ([]ItemCount, error)
 }
 
 type InventoryTransactionRepo struct {
@@ -98,4 +99,23 @@ func (r *InventoryTransactionRepo) GetByID(c common.Context, id any) (entities.I
 	tx, err := gorm.G[entities.InventoryTransaction](r.db).Where("id = ?", id).First(ctx)
 
 	return tx, err
+}
+
+func (r *InventoryTransactionRepo) GetItemCounts(itemID any) ([]ItemCount, error) {
+	itemCounts := make([]ItemCount, 0)
+	query := `
+		select
+			it.transaction_type as transaction_type,
+			SUM(it.quantity) as quantity
+		from inventory_transactions it 
+		where it.item_id = ?
+		and it.transaction_type in ('RECEIVE', 'DISPOSE', 'CONSUME', 'LOST')
+		and it.deleted_at isnull
+		group by
+			it.transaction_type 
+	`
+
+	err := r.db.Raw(query, itemID).Scan(&itemCounts).Error
+
+	return itemCounts, err
 }
