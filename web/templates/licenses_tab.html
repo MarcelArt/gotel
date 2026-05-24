@@ -1,0 +1,258 @@
+{{ define "outlet" }}
+<header class="main-header">
+    <div>
+        <h1 class="title-md">Third-Party Licenses</h1>
+        <p class="body-sm" style="margin-top: 4px;">Open-source attributions and licenses for dependencies used in Gotel.</p>
+    </div>
+    <div class="badge">Attributions</div>
+</header>
+
+{{ if .Error }}
+<div class="alert">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <span>{{ .Error }}</span>
+</div>
+{{ else }}
+
+<div x-data="{ 
+    searchQuery: '', 
+    expanded: {},
+    matches(name) {
+        if (!this.searchQuery) return true;
+        return name.toLowerCase().includes(this.searchQuery.toLowerCase());
+    },
+    expandAll(show) {
+        {{ range .Licenses }}
+        this.expanded['{{ .Package }}'] = show;
+        {{ end }}
+    },
+    countVisible() {
+        let count = 0;
+        let query = this.searchQuery.toLowerCase();
+        {{ range .Licenses }}
+        if ('{{ .Package }}'.toLowerCase().includes(query)) {
+            count++;
+        }
+        {{ end }}
+        return count;
+    }
+}" class="licenses-container">
+
+    <div class="search-toolbar">
+        <div class="search-wrapper">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" x-model="searchQuery" placeholder="Search dependencies..." class="form-control search-input" aria-label="Search dependencies">
+        </div>
+        <div class="toolbar-actions">
+            <span class="badge" x-text="countVisible() + ' of {{ len .Licenses }} packages'"></span>
+            <button @click="expandAll(true)" class="btn btn-secondary btn-sm">Expand All</button>
+            <button @click="expandAll(false)" class="btn btn-secondary btn-sm">Collapse All</button>
+        </div>
+    </div>
+
+    <div class="licenses-list">
+        {{ range .Licenses }}
+        <div class="license-card" x-show="matches('{{ .Package }}')" x-cloak>
+            <div class="license-card-header" @click="expanded['{{ .Package }}'] = !expanded['{{ .Package }}']">
+                <div class="package-info">
+                    <svg class="package-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4L7.5 4.21M12 22.08V12M3 6.92v10.16L12 22.08M12 12l9-5.08v10.16L12 22.08M12 12L3 6.92 12 1.84l9 5.08L12 12"/></svg>
+                    <span class="package-name">{{ .Package }}</span>
+                </div>
+                <div class="header-actions">
+                    <svg class="chevron-icon" :class="{ 'rotated': expanded['{{ .Package }}'] }" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
+            <div class="license-card-body" x-show="expanded['{{ .Package }}']" style="display: none;">
+                {{ range .Files }}
+                <div class="license-file-section">
+                    <div class="file-header">
+                        <span class="file-badge">{{ .Name }}</span>
+                    </div>
+                    <pre class="license-text"><code>{{ .Content }}</code></pre>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{ end }}
+
+<style>
+.licenses-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.search-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    background-color: var(--color-surface);
+    padding: 16px 20px;
+    border-radius: var(--rounded-md);
+    border: 1px solid rgba(185, 200, 222, 0.05);
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-secondary);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.search-input {
+    padding-left: 44px !important;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-sm {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    min-height: auto !important;
+}
+
+.licenses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.license-card {
+    background-color: var(--color-surface);
+    border: 1px solid rgba(185, 200, 222, 0.05);
+    border-radius: var(--rounded-md);
+    transition: all var(--transition-fast);
+    overflow: hidden;
+}
+
+.license-card:hover {
+    border-color: rgba(192, 193, 255, 0.15);
+}
+
+.license-card-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-fast);
+}
+
+.license-card-header:hover {
+    background-color: rgba(185, 200, 222, 0.02);
+}
+
+.package-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.package-icon {
+    color: var(--color-primary);
+    opacity: 0.8;
+}
+
+.package-name {
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 15px;
+    color: #ffffff;
+    word-break: break-all;
+}
+
+.chevron-icon {
+    color: var(--color-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.chevron-icon.rotated {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.license-card-body {
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid rgba(185, 200, 222, 0.03);
+    background-color: rgba(11, 19, 38, 0.2);
+}
+
+.license-file-section {
+    margin-top: 16px;
+}
+
+.file-header {
+    margin-bottom: 8px;
+}
+
+.file-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background-color: rgba(192, 193, 255, 0.1);
+    color: var(--color-primary);
+    border: 1px solid rgba(192, 193, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: var(--rounded-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.license-text {
+    background-color: var(--color-surface-container);
+    border: 1px solid rgba(185, 200, 222, 0.08);
+    border-radius: var(--rounded-default);
+    padding: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #dae2fd;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Custom scrollbar for license texts */
+.license-text::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.license-text::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.license-text::-webkit-scrollbar-thumb {
+    background: rgba(185, 200, 222, 0.15);
+    border-radius: 4px;
+}
+
+.license-text::-webkit-scrollbar-thumb:hover {
+    background: rgba(185, 200, 222, 0.3);
+}
+
+[x-cloak] {
+    display: none !important;
+}
+</style>
+{{ end }}

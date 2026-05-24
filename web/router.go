@@ -30,6 +30,7 @@ func SetupRoutes(app *fiber.App) {
 	views["items"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/items_tab.html"))
 	views["transactions"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/transactions_tab.html"))
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
+	views["licenses"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/licenses_tab.html"))
 
 	// Instantiate services
 	uRepo := users.NewUserRepo(configs.DB)
@@ -105,4 +106,5 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Post("/inventory-transactions", h.InventoryTransactionsPost)
 
 	authGroup.Get("/settings", h.SettingsGet)
+	authGroup.Get("/licenses", h.LicensesGet)
 }

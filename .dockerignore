@@ -24,3 +24,5 @@ Makefile
 
 # Uploaded assets (dynamic runtime files)
 public/uploads/*
+
+THIRD_PARTY_LICENSES
