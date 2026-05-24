@@ -21,3 +21,4 @@ This project enforces strict guidelines for AI coding agents to protect the work
 
 - **Maintain Documentation Integrity:** Retain all pre-existing comments, docstrings, and struct annotations unless explicitly requested otherwise.
 - **Link Reference Formatting:** When mentioning files or functions, use clickable links in Markdown format referencing absolute file URIs or code lines.
+- **CSS Cache Busting:** Whenever making changes to CSS files, you must update/increment the version query parameter (e.g., `?v=X.Y.Z`) in the template's `<link>` stylesheet tags to bypass browser caching and ensure the updates are immediately active.
