@@ -53,6 +53,10 @@ func MigrateDB() error {
 
 	seedDefaultUser()
 	fmt.Println("Default User Seeded")
+	seedLocations()
+	fmt.Println("Default Locations Seeded")
+	seedCategories()
+	fmt.Println("Default Categories Seeded")
 
 	return err
 }
@@ -97,4 +101,51 @@ func seedDefaultUser() {
 		RoleID: role.ID,
 	}
 	DB.Where("role_id = ? and user_id = ?", role.ID, user.ID).FirstOrCreate(&userRole)
+}
+
+func seedLocations() {
+	locations := []entities.Location{
+		{
+			Value:       "Main Warehouse",
+			IsVirtual:   false,
+			Description: "Primary inventory storage",
+		},
+		{
+			Value:       "Laundry",
+			IsVirtual:   false,
+			Description: "Laundry processing area",
+		},
+		{
+			Value:       "Disposed",
+			IsVirtual:   true,
+			Description: "For disposed or damaged items",
+		},
+		{
+			Value:       "Missing",
+			IsVirtual:   true,
+			Description: "For lost or unaccounted items",
+		},
+		{
+			Value:       "Consumed",
+			IsVirtual:   true,
+			Description: "For consumable items already used",
+		},
+	}
+
+	for _, location := range locations {
+		DB.Where("value = ?", location.Value).FirstOrCreate(&location)
+	}
+}
+
+func seedCategories() {
+	categories := []entities.Category{
+		{Value: "Linen"},
+		{Value: "Amenities"},
+		{Value: "Cleaning Supplies"},
+		{Value: "Equipment"},
+	}
+
+	for _, category := range categories {
+		DB.Where("value = ?", category.Value).FirstOrCreate(&category)
+	}
 }
