@@ -236,6 +236,80 @@
         font-weight: 400;
         color: var(--color-secondary);
     }
+
+    /* --- Floating Action Button (FAB) --- */
+    .fab-container {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        display: flex;
+        align-items: center;
+        z-index: 100;
+    }
+    .fab-button {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--color-primary), #818cf8);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fab-button svg {
+        transition: transform 0.3s ease;
+    }
+    .fab-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6), 0 0 0 2px rgba(99, 102, 241, 0.3);
+        background: linear-gradient(135deg, #818cf8, var(--color-primary));
+    }
+    .fab-button:hover svg {
+        transform: rotate(90deg);
+    }
+    .fab-button:active {
+        transform: scale(0.95);
+    }
+    .fab-tooltip {
+        position: absolute;
+        right: 72px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(185, 200, 222, 0.15);
+        color: white;
+        padding: 6px 12px;
+        border-radius: var(--rounded-default);
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    .fab-container:hover .fab-tooltip {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+        .fab-container {
+            bottom: 24px;
+            right: 24px;
+        }
+        .fab-button {
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+        }
+        .fab-tooltip {
+            display: none;
+        }
+    }
     </style>
 
     <!-- Back Button -->
@@ -294,14 +368,6 @@
                         {{ end }}
                     {{ end }}
                 </div>
-
-                <!-- Action Button -->
-                {{ if .HasPermission "inventoryTransactions#create" }}
-                <button class="btn btn-primary new-tx-btn" @click="showCreateModal = true" style="width: auto; min-height: 40px; font-size: 14px; padding: 0 16px; flex-shrink: 0;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    New Transaction
-                </button>
-                {{ end }}
             </div>
         </div>
     </div>
@@ -550,5 +616,17 @@
             </form>
         </div>
     </div>
+    <!-- Floating Action Button (FAB) -->
+    {{ if .HasPermission "inventoryTransactions#create" }}
+    <div class="fab-container">
+        <span class="fab-tooltip">New Transaction</span>
+        <button class="fab-button" @click="showCreateModal = true" aria-label="New Transaction">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+    {{ end }}
 </div>
 {{ end }}
