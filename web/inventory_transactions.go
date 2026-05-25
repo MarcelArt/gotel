@@ -1,7 +1,9 @@
 package web
 
 import (
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/MarcelArt/gotel/internal/v1/features/inventory_transactions"
 	"github.com/gofiber/fiber/v3"
@@ -32,9 +34,13 @@ type InventoryTransactionsViewModel struct {
 	ItemUnit     string
 	ItemPicture  string
 	ItemCounts   []inventory_transactions.ItemCount
+	TimeRange    string
+	StartDate    string
+	EndDate      string
 	Error        string
 	Success      string
 }
+
 
 func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, itemID uint) (InventoryTransactionsViewModel, error) {
 	currentUser, err := h.userService.GetByID(c, userID)
@@ -46,6 +52,64 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 	if err != nil {
 		return InventoryTransactionsViewModel{}, err
 	}
+
+	itemIDStr := strconv.FormatUint(uint64(itemID), 10)
+	timeRange := c.Query("timeRange")
+	startDateStr := c.Query("startDate")
+	endDateStr := c.Query("endDate")
+
+	var startTime, endTime time.Time
+	var hasRange bool
+	now := time.Now()
+
+	switch timeRange {
+	case "today":
+		startTime = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+		endTime = time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 999999999, now.Location())
+		hasRange = true
+	case "yesterday":
+		yesterday := now.AddDate(0, 0, -1)
+		startTime = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, now.Location())
+		endTime = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 59, 59, 999999999, now.Location())
+		hasRange = true
+	case "this_week":
+		weekday := int(now.Weekday())
+		offset := weekday - 1
+		if weekday == 0 {
+			offset = 6
+		}
+		monday := now.AddDate(0, 0, -offset)
+		startTime = time.Date(monday.Year(), monday.Month(), monday.Day(), 0, 0, 0, 0, now.Location())
+		sunday := monday.AddDate(0, 0, 6)
+		endTime = time.Date(sunday.Year(), sunday.Month(), sunday.Day(), 23, 59, 59, 999999999, now.Location())
+		hasRange = true
+	case "this_month":
+		startTime = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		nextMonth := startTime.AddDate(0, 1, 0)
+		endTime = nextMonth.Add(-time.Nanosecond)
+		hasRange = true
+	case "custom":
+		if startDateStr != "" && endDateStr != "" {
+			startDate, err1 := time.ParseInLocation("2006-01-02", startDateStr, now.Location())
+			endDate, err2 := time.ParseInLocation("2006-01-02", endDateStr, now.Location())
+			if err1 == nil && err2 == nil {
+				startTime = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, now.Location())
+				endTime = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, 999999999, now.Location())
+				hasRange = true
+			}
+		}
+	}
+
+	var filtersJSON string
+	if hasRange {
+		filtersJSON = fmt.Sprintf(`[["item_id", "=", "%s"], ["and"], ["created_at", ">=", "%s"], ["and"], ["created_at", "<=", "%s"]]`,
+			itemIDStr, startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
+	} else {
+		filtersJSON = fmt.Sprintf(`[["item_id", "=", "%s"]]`, itemIDStr)
+	}
+
+	c.Request().URI().QueryArgs().Set("filters", filtersJSON)
+	c.Request().URI().QueryArgs().Set("sort", "-id")
 
 	pageInfo, txsList := h.inventoryTransactionService.Read(c)
 
@@ -103,7 +167,12 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 		PrevPage:    prevPage,
 	}
 
-	itemCounts, err := h.inventoryTransactionService.GetItemCounts(itemID)
+	var itemCounts []inventory_transactions.ItemCount
+	if hasRange {
+		itemCounts, err = h.inventoryTransactionService.GetItemCounts(itemID, startTime, endTime)
+	} else {
+		itemCounts, err = h.inventoryTransactionService.GetItemCounts(itemID)
+	}
 	if err != nil {
 		itemCounts = []inventory_transactions.ItemCount{}
 	}
@@ -123,6 +192,9 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 		ItemUnit:     item.Unit,
 		ItemPicture:  item.Picture,
 		ItemCounts:   itemCounts,
+		TimeRange:    timeRange,
+		StartDate:    startDateStr,
+		EndDate:      endDateStr,
 	}, nil
 }
 
@@ -142,10 +214,6 @@ func (h *WebHandler) InventoryTransactionsGet(c fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Item ID")
 	}
-
-	// Set GORM filter and sorting programmatically before calling Read
-	c.Request().URI().QueryArgs().Set("filters", `[["item_id", "=", "`+itemIDStr+`"]]`)
-	c.Request().URI().QueryArgs().Set("sort", "-id")
 
 	vm, err := h.getInventoryTransactionsViewModel(c, userID, uint(itemID))
 	if err != nil {
@@ -177,7 +245,6 @@ func (h *WebHandler) InventoryTransactionsPost(c fiber.Ctx) error {
 	quantity, err := strconv.ParseFloat(quantityStr, 64)
 	if err != nil {
 		c.Request().Header.SetMethod(fiber.MethodGet)
-		c.Request().URI().QueryArgs().Set("filters", `[["item_id", "=", "`+itemIDStr+`"]]`)
 		vm, _ := h.getInventoryTransactionsViewModel(c, userID, uint(itemID))
 		vm.Error = "Invalid quantity value"
 		return h.renderTab(c, "transactions", vm)
@@ -225,8 +292,6 @@ func (h *WebHandler) InventoryTransactionsPost(c fiber.Ctx) error {
 	_, createErr := h.inventoryTransactionService.Create(c, input)
 
 	c.Request().Header.SetMethod(fiber.MethodGet)
-	c.Request().URI().QueryArgs().Set("filters", `[["item_id", "=", "`+itemIDStr+`"]]`)
-	c.Request().URI().QueryArgs().Set("sort", "-id")
 	vm, err := h.getInventoryTransactionsViewModel(c, userID, uint(itemID))
 	if err != nil {
 		return h.LogoutPost(c)
