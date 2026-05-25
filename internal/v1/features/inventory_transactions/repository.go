@@ -2,6 +2,7 @@ package inventory_transactions
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/entities"
@@ -12,7 +13,8 @@ import (
 
 type IInventoryTransactionRepo interface {
 	common.IBaseCrudRepo[entities.InventoryTransaction, InventoryTransactionInput, InventoryTransactionPage]
-	GetItemCounts(itemID any) ([]ItemCount, error)
+	GetItemCounts(itemID any, timeRanges ...time.Time) ([]ItemCount, error)
+	GetItemActualQuantity(itemID any) (float64, error)
 }
 
 type InventoryTransactionRepo struct {
@@ -101,8 +103,9 @@ func (r *InventoryTransactionRepo) GetByID(c common.Context, id any) (entities.I
 	return tx, err
 }
 
-func (r *InventoryTransactionRepo) GetItemCounts(itemID any) ([]ItemCount, error) {
+func (r *InventoryTransactionRepo) GetItemCounts(itemID any, timeRanges ...time.Time) ([]ItemCount, error) {
 	itemCounts := make([]ItemCount, 0)
+
 	query := `
 		select
 			it.transaction_type as transaction_type,
@@ -111,11 +114,46 @@ func (r *InventoryTransactionRepo) GetItemCounts(itemID any) ([]ItemCount, error
 		where it.item_id = ?
 		and it.transaction_type in ('RECEIVE', 'DISPOSE', 'CONSUME', 'LOST')
 		and it.deleted_at isnull
+		%s
 		group by
 			it.transaction_type 
 	`
 
-	err := r.db.Raw(query, itemID).Scan(&itemCounts).Error
+	dynQuery := common.NewDynamicRawQuery(query, itemID)
+	if len(timeRanges) >= 2 {
+		dynQuery.AddWhere("and it.created_at between ? and ?", timeRanges[0], timeRanges[1])
+	}
+
+	query, params := dynQuery.Build()
+
+	err := r.db.Raw(query, params...).Scan(&itemCounts).Error
 
 	return itemCounts, err
+}
+
+func (r *InventoryTransactionRepo) GetItemActualQuantity(itemID any) (float64, error) {
+	var quantity float64
+	query := `
+		SELECT
+			COALESCE(SUM(
+				CASE
+					WHEN transaction_type = 'RECEIVE'
+						THEN quantity
+					WHEN transaction_type IN (
+						'DISPOSE',
+						'CONSUME',
+						'LOST'
+					)
+						THEN -quantity
+					ELSE 0
+				END
+			), 0) AS balance
+		FROM inventory_transactions
+		WHERE item_id = ?
+		AND deleted_at IS NULL
+		GROUP BY item_id;
+	`
+
+	err := r.db.Raw(query, itemID).Scan(&quantity).Error
+	return quantity, err
 }

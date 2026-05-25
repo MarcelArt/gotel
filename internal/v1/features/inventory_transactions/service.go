@@ -2,6 +2,7 @@ package inventory_transactions
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/entities"
@@ -11,7 +12,7 @@ import (
 
 type IInventoryTransactionService interface {
 	common.IBaseCrudService[entities.InventoryTransaction, InventoryTransactionInput, InventoryTransactionPage]
-	GetItemCounts(itemID any) ([]ItemCount, error)
+	GetItemCounts(itemID any, timeRanges ...time.Time) ([]ItemCount, error)
 }
 
 type InventoryTransactionService struct {
@@ -46,20 +47,19 @@ func (s *InventoryTransactionService) GetByID(c common.Context, id any) (entitie
 	return s.repo.GetByID(c, id)
 }
 
-func (s *InventoryTransactionService) GetItemCounts(itemID any) ([]ItemCount, error) {
-	itemCounts, err := s.repo.GetItemCounts(itemID)
+// timeRanges: first element is start, second is end
+func (s *InventoryTransactionService) GetItemCounts(itemID any, timeRanges ...time.Time) ([]ItemCount, error) {
+	itemCounts, err := s.repo.GetItemCounts(itemID, timeRanges...)
 	if err != nil {
 		return nil, fmt.Errorf("failed retrieving item counts: %w", err)
 	}
 
-	actualQuantity := ItemCount{TransactionType: "ACTUAL"}
-	for _, itemCount := range itemCounts {
-		if itemCount.TransactionType == "RECEIVE" {
-			actualQuantity.Quantity += itemCount.Quantity
-		} else {
-			actualQuantity.Quantity -= itemCount.Quantity
-		}
+	actual, err := s.repo.GetItemActualQuantity(itemID)
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving actual quantity: %w", err)
 	}
+
+	actualQuantity := ItemCount{TransactionType: "ACTUAL", Quantity: actual}
 
 	itemCounts = append(itemCounts, actualQuantity)
 
