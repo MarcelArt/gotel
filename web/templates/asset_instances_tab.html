@@ -132,6 +132,12 @@
                         <td style="font-weight: 500; color: white; font-family: monospace;">{{ .Code }}</td>
                         <td style="text-align: right; padding-right: 24px;">
                             <div style="display: inline-flex; gap: 8px;">
+                                {{ if $.HasPermission "asset_transactions#read" }}
+                                <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px;"
+                                        hx-get="/asset-transactions?instanceId={{ .ID }}" hx-target="#outlet" hx-push-url="true">
+                                    History
+                                </button>
+                                {{ end }}
                                 {{ if $.HasPermission "asset_instances#update" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px;"
                                         hx-get="/asset-instances/{{ .ID }}/edit" hx-target="#modal-container">

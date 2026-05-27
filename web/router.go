@@ -25,6 +25,7 @@ func SetupRoutes(app *fiber.App) {
 	views["items"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/items_tab.html"))
 	views["transactions"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/transactions_tab.html"))
 	views["asset_instances"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/asset_instances_tab.html"))
+	views["asset_transactions"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/asset_transactions_tab.html"))
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
 	views["licenses"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/licenses_tab.html"))
 	views["unauthorized"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/unauthorized_tab.html"))
@@ -38,6 +39,7 @@ func SetupRoutes(app *fiber.App) {
 	itemRepo := repositories.NewItemRepo(configs.DB)
 	itRepo := repositories.NewInventoryTransactionRepo(configs.DB)
 	aiRepo := repositories.NewAssetInstanceRepo(configs.DB)
+	atRepo := repositories.NewAssetTransactionRepo(configs.DB)
 
 	uService := services.NewUserService(configs.DB, uRepo, urRepo)
 	rService := services.NewRoleService(rRepo)
@@ -46,8 +48,9 @@ func SetupRoutes(app *fiber.App) {
 	itemService := services.NewItemService(itemRepo)
 	itService := services.NewInventoryTransactionService(itRepo)
 	aiService := services.NewAssetInstanceService(aiRepo)
+	atService := services.NewAssetTransactionService(atRepo)
 
-	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService)
+	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService, atService)
 
 	// Register routes
 	app.Get("/login", h.LoginGet)
@@ -110,6 +113,13 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Get("/asset-instances/:id/edit", h.WebAuthz("asset_instances#update"), h.AssetInstancesEditGet)
 	authGroup.Put("/asset-instances/:id", h.WebAuthz("asset_instances#update"), h.AssetInstancesPut)
 	authGroup.Delete("/asset-instances/:id", h.WebAuthz("asset_instances#delete"), h.AssetInstancesDelete)
+
+	// Asset Transactions routes
+	authGroup.Get("/asset-transactions", h.WebAuthz("asset_transactions#read"), h.AssetTransactionsGet)
+	authGroup.Post("/asset-transactions", h.WebAuthz("asset_transactions#create"), h.AssetTransactionsPost)
+	authGroup.Get("/asset-transactions/:id/edit", h.WebAuthz("asset_transactions#update"), h.AssetTransactionsEditGet)
+	authGroup.Put("/asset-transactions/:id", h.WebAuthz("asset_transactions#update"), h.AssetTransactionsPut)
+	authGroup.Delete("/asset-transactions/:id", h.WebAuthz("asset_transactions#delete"), h.AssetTransactionsDelete)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)
