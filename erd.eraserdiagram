@@ -48,3 +48,27 @@ inventory_transactions.from_id > locations.id
 inventory_transactions.to_id > locations.id
 inventory_transactions.actor_id > users.id
 // inventories end
+
+// assets start
+asset_instances {  
+  id uint pk // gorm.Model
+  code string unique
+  item_id uint fk
+}
+
+asset_transactions {
+  id uint pk // gorm.Model
+  transaction_type string // ASSIGN, REPAIR_IN, REPAIR_OUT, DISPOSE, LOST, BROKEN, TRANSFER, OTHER
+  status string // AVAILABLE, IN_USE, REPAIRING, LOST, DISPOSED, BROKEN
+  note string
+  location_id uint fk
+  instance_id uint fk
+  actor_id uint fk
+}
+
+asset_instances.item_id > items.id
+
+asset_transactions.location_id > locations.id
+asset_transactions.instance_id > asset_instances.id
+asset_transactions.actor_id > users.id
+// assets end
