@@ -10,9 +10,12 @@ import (
 )
 
 type AssetInstanceWebViewModel struct {
-	ID     uint
-	Code   string
-	ItemID uint
+	ID       uint
+	Code     string
+	ItemID   uint
+	Status   string
+	Location string
+	Note     string
 }
 
 type AssetInstancesViewModel struct {
@@ -48,9 +51,12 @@ func (h *WebHandler) getAssetInstancesViewModel(c fiber.Ctx, userID any, itemID 
 	webInstances := make([]AssetInstanceWebViewModel, len(instancesList))
 	for i, inst := range instancesList {
 		webInstances[i] = AssetInstanceWebViewModel{
-			ID:     inst.ID,
-			Code:   inst.Code,
-			ItemID: inst.ItemID,
+			ID:       inst.ID,
+			Code:     inst.Code,
+			ItemID:   inst.ItemID,
+			Status:   inst.Status,
+			Location: inst.Location,
+			Note:     inst.Note,
 		}
 	}
 

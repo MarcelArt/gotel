@@ -40,7 +40,7 @@ func NewAssetInstanceRepo(db *gorm.DB) *AssetInstanceRepo {
 				order by t.created_at desc
 				limit 1
 			) as latest_transaction on true
-			join locations l on latest_transaction.location_id = l.id 
+			left join locations l on latest_transaction.location_id = l.id 
 			where ai.deleted_at isnull
 		`,
 	}
