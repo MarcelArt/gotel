@@ -67,6 +67,9 @@ func (h *WebHandler) renderTab(c fiber.Ctx, page string, data any) error {
 	var buf bytes.Buffer
 	var err error
 	if c.Get("HX-Request") == "true" {
+		if hasTitle, ok := data.(interface{ GetTitle() string }); ok {
+			buf.WriteString("<title>" + template.HTMLEscapeString(hasTitle.GetTitle()) + "</title>\n")
+		}
 		err = t.ExecuteTemplate(&buf, "outlet", data)
 	} else {
 		err = t.ExecuteTemplate(&buf, "layout", data)

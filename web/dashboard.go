@@ -36,6 +36,11 @@ func (vm BaseViewModel) PermissionName(key string) string {
 	return key
 }
 
+func (vm BaseViewModel) GetTitle() string {
+	return vm.Title
+}
+
+
 // DashboardViewModel represents the specific data required to render the dashboard view.
 type DashboardViewModel struct {
 	BaseViewModel
