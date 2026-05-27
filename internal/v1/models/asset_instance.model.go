@@ -11,7 +11,10 @@ type AssetInstanceInput struct {
 }
 
 type AssetInstancePage struct {
-	ID     uint   `json:"ID"`
-	Code   string `json:"code"`
-	ItemID uint   `json:"itemId"`
+	ID       uint   `json:"ID"`
+	Code     string `json:"code"`
+	ItemID   uint   `json:"itemId"`
+	Status   string `json:"status"`
+	Location string `json:"location"`
+	Note     string `json:"note"`
 }

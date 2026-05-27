@@ -24,8 +24,25 @@ var _ IAssetInstanceRepo = &AssetInstanceRepo{}
 
 func NewAssetInstanceRepo(db *gorm.DB) *AssetInstanceRepo {
 	return &AssetInstanceRepo{
-		db:        db,
-		pageQuery: "SELECT id, code, item_id FROM asset_instances where deleted_at isnull",
+		db: db,
+		pageQuery: `
+			select
+				ai.*,
+				latest_transaction.status as status,
+				l.value as location,
+				latest_transaction.note as note
+			from asset_instances ai 
+			left join lateral (
+				select *
+				from asset_transactions t 
+				where t.instance_id = ai.id
+				and t.deleted_at isnull
+				order by t.created_at desc
+				limit 1
+			) as latest_transaction on true
+			join locations l on latest_transaction.location_id = l.id 
+			where ai.deleted_at isnull
+		`,
 	}
 }
 
