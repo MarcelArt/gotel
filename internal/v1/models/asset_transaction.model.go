@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/MarcelArt/gotel/internal/common"
 )
 
@@ -15,11 +17,14 @@ type AssetTransactionInput struct {
 }
 
 type AssetTransactionPage struct {
-	ID              uint   `json:"ID"`
-	TransactionType string `json:"transactionType"`
-	Status          string `json:"status"`
-	Note            string `json:"note"`
-	LocationID      uint   `json:"locationId"`
-	InstanceID      uint   `json:"instanceId"`
-	ActorID         uint   `json:"actorId"`
+	ID              uint      `json:"ID"`
+	CreatedAt       time.Time `json:"createdAt"`
+	TransactionType string    `json:"transactionType"`
+	Status          string    `json:"status"`
+	Note            string    `json:"note"`
+	LocationID      uint      `json:"locationId"`
+	InstanceID      uint      `json:"instanceId"`
+	ActorID         uint      `json:"actorId"`
+	Location        string    `json:"location"`
+	Actor           string    `json:"actor"`
 }

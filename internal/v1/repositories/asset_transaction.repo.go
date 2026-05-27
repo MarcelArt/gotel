@@ -24,8 +24,17 @@ var _ IAssetTransactionRepo = &AssetTransactionRepo{}
 
 func NewAssetTransactionRepo(db *gorm.DB) *AssetTransactionRepo {
 	return &AssetTransactionRepo{
-		db:        db,
-		pageQuery: "SELECT id, transaction_type, status, note, location_id, instance_id, actor_id FROM asset_transactions where deleted_at isnull",
+		db: db,
+		pageQuery: `
+			SELECT 
+				t.*,
+				l.value location,
+				u.username actor
+			FROM asset_transactions t
+			join locations l on t.location_id = l.id
+			join users u on t.actor_id = u.id
+			where t.deleted_at isnull
+		`,
 	}
 }
 
