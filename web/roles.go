@@ -56,6 +56,16 @@ var AvailablePermissions = []PermissionDefinition{
 	{"inventoryTransactions#read", "Read Inventory Transactions", "Allows listing and viewing inventory transactions"},
 	{"inventoryTransactions#update", "Update Inventory Transactions", "Allows updating inventory transactions"},
 	{"inventoryTransactions#delete", "Delete Inventory Transactions", "Allows deleting inventory transactions"},
+
+	{"assetInstances#create", "Create Asset Instances", "Allows creating new asset instances"},
+	{"assetInstances#read", "Read Asset Instances", "Allows listing and viewing asset instances"},
+	{"assetInstances#update", "Update Asset Instances", "Allows updating asset instances"},
+	{"assetInstances#delete", "Delete Asset Instances", "Allows deleting asset instances"},
+
+	{"assetTransactions#create", "Create Asset Transactions", "Allows creating new asset transactions"},
+	{"assetTransactions#read", "Read Asset Transactions", "Allows listing and viewing asset transactions"},
+	{"assetTransactions#update", "Update Asset Transactions", "Allows updating asset transactions"},
+	{"assetTransactions#delete", "Delete Asset Transactions", "Allows deleting asset transactions"},
 }
 
 type RoleWebViewModel struct {

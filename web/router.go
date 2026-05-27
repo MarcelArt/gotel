@@ -108,18 +108,18 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Post("/inventory-transactions", h.WebAuthz("inventoryTransactions#create"), h.InventoryTransactionsPost)
 
 	// Asset Instances routes
-	authGroup.Get("/asset-instances", h.WebAuthz("asset_instances#read"), h.AssetInstancesGet)
-	authGroup.Post("/asset-instances", h.WebAuthz("asset_instances#create"), h.AssetInstancesPost)
-	authGroup.Get("/asset-instances/:id/edit", h.WebAuthz("asset_instances#update"), h.AssetInstancesEditGet)
-	authGroup.Put("/asset-instances/:id", h.WebAuthz("asset_instances#update"), h.AssetInstancesPut)
-	authGroup.Delete("/asset-instances/:id", h.WebAuthz("asset_instances#delete"), h.AssetInstancesDelete)
+	authGroup.Get("/asset-instances", h.WebAuthz("assetInstances#read"), h.AssetInstancesGet)
+	authGroup.Post("/asset-instances", h.WebAuthz("assetInstances#create"), h.AssetInstancesPost)
+	authGroup.Get("/asset-instances/:id/edit", h.WebAuthz("assetInstances#update"), h.AssetInstancesEditGet)
+	authGroup.Put("/asset-instances/:id", h.WebAuthz("assetInstances#update"), h.AssetInstancesPut)
+	authGroup.Delete("/asset-instances/:id", h.WebAuthz("assetInstances#delete"), h.AssetInstancesDelete)
 
 	// Asset Transactions routes
-	authGroup.Get("/asset-transactions", h.WebAuthz("asset_transactions#read"), h.AssetTransactionsGet)
-	authGroup.Post("/asset-transactions", h.WebAuthz("asset_transactions#create"), h.AssetTransactionsPost)
-	authGroup.Get("/asset-transactions/:id/edit", h.WebAuthz("asset_transactions#update"), h.AssetTransactionsEditGet)
-	authGroup.Put("/asset-transactions/:id", h.WebAuthz("asset_transactions#update"), h.AssetTransactionsPut)
-	authGroup.Delete("/asset-transactions/:id", h.WebAuthz("asset_transactions#delete"), h.AssetTransactionsDelete)
+	authGroup.Get("/asset-transactions", h.WebAuthz("assetTransactions#read"), h.AssetTransactionsGet)
+	authGroup.Post("/asset-transactions", h.WebAuthz("assetTransactions#create"), h.AssetTransactionsPost)
+	authGroup.Get("/asset-transactions/:id/edit", h.WebAuthz("assetTransactions#update"), h.AssetTransactionsEditGet)
+	authGroup.Put("/asset-transactions/:id", h.WebAuthz("assetTransactions#update"), h.AssetTransactionsPut)
+	authGroup.Delete("/asset-transactions/:id", h.WebAuthz("assetTransactions#delete"), h.AssetTransactionsDelete)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)

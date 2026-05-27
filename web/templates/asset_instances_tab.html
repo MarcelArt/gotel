@@ -132,19 +132,19 @@
                         <td style="font-weight: 500; color: white; font-family: monospace;">{{ .Code }}</td>
                         <td style="text-align: right; padding-right: 24px;">
                             <div style="display: inline-flex; gap: 8px;">
-                                {{ if $.HasPermission "asset_transactions#read" }}
+                                {{ if $.HasPermission "assetTransactions#read" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px;"
                                         hx-get="/asset-transactions?instanceId={{ .ID }}" hx-target="#outlet" hx-push-url="true">
                                     History
                                 </button>
                                 {{ end }}
-                                {{ if $.HasPermission "asset_instances#update" }}
+                                {{ if $.HasPermission "assetInstances#update" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px;"
                                         hx-get="/asset-instances/{{ .ID }}/edit" hx-target="#modal-container">
                                     Edit
                                 </button>
                                 {{ end }}
-                                {{ if $.HasPermission "asset_instances#delete" }}
+                                {{ if $.HasPermission "assetInstances#delete" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px; border-color: rgba(255, 180, 171, 0.15); color: var(--color-error);"
                                         hx-delete="/asset-instances/{{ .ID }}" hx-confirm="Are you sure you want to delete asset instance '{{ .Code }}'?" hx-target="#outlet">
                                     Delete
@@ -225,7 +225,7 @@
     <div id="modal-container"></div>
 
     <!-- Floating Action Button (FAB) -->
-    {{ if .HasPermission "asset_instances#create" }}
+    {{ if .HasPermission "assetInstances#create" }}
     <div class="fab-container">
         <span class="fab-tooltip">Add Instance</span>
         <button class="fab-button" @click="showCreateModal = true" aria-label="Add Instance">

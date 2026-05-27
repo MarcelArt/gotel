@@ -236,13 +236,13 @@
                         </td>
                         <td style="text-align: right; padding-right: 24px;">
                             <div style="display: inline-flex; gap: 8px;">
-                                {{ if $.HasPermission "asset_transactions#update" }}
+                                {{ if $.HasPermission "assetTransactions#update" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px;"
                                         hx-get="/asset-transactions/{{ .ID }}/edit" hx-target="#modal-container">
                                     Edit
                                 </button>
                                 {{ end }}
-                                {{ if $.HasPermission "asset_transactions#delete" }}
+                                {{ if $.HasPermission "assetTransactions#delete" }}
                                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px; border-color: rgba(255, 180, 171, 0.15); color: var(--color-error);"
                                         hx-delete="/asset-transactions/{{ .ID }}" hx-confirm="Are you sure you want to delete transaction #{{ .ID }}?" hx-target="#outlet">
                                     Delete
@@ -315,13 +315,13 @@
             <div class="tx-card-note">{{ .Note }}</div>
             {{ end }}
             <div style="display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(185, 200, 222, 0.05);">
-                {{ if $.HasPermission "asset_transactions#update" }}
+                {{ if $.HasPermission "assetTransactions#update" }}
                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px; flex: 1;"
                         hx-get="/asset-transactions/{{ .ID }}/edit" hx-target="#modal-container">
                     Edit
                 </button>
                 {{ end }}
-                {{ if $.HasPermission "asset_transactions#delete" }}
+                {{ if $.HasPermission "assetTransactions#delete" }}
                 <button class="btn btn-secondary" style="min-height: 28px; padding: 0 8px; font-size: 11px; flex: 1; border-color: rgba(255, 180, 171, 0.15); color: var(--color-error);"
                         hx-delete="/asset-transactions/{{ .ID }}" hx-confirm="Are you sure you want to delete transaction #{{ .ID }}?" hx-target="#outlet">
                     Delete
@@ -448,7 +448,7 @@
     <div id="modal-container"></div>
 
     <!-- Floating Action Button (FAB) -->
-    {{ if $.HasPermission "asset_transactions#create" }}
+    {{ if $.HasPermission "assetTransactions#create" }}
     <div class="fab-container">
         <span class="fab-tooltip">Record Transaction</span>
         <button class="fab-button" @click="showCreateModal = true" aria-label="Record Transaction">

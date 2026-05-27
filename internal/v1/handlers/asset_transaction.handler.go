@@ -142,9 +142,9 @@ func (h *AssetTransactionHandler) SetupRoutes(v1 fiber.Router) {
 
 	txs.Use(middlewares.Authn())
 
-	txs.Post("/", middlewares.Authz("asset_transactions#create"), h.Create)
-	txs.Get("/", middlewares.Authz("asset_transactions#read"), h.Read)
-	txs.Get("/:id", middlewares.Authz("asset_transactions#read"), h.GetByID)
-	txs.Put("/:id", middlewares.Authz("asset_transactions#update"), h.Update)
-	txs.Delete("/:id", middlewares.Authz("asset_transactions#delete"), h.Delete)
+	txs.Post("/", middlewares.Authz("assetTransactions#create"), h.Create)
+	txs.Get("/", middlewares.Authz("assetTransactions#read"), h.Read)
+	txs.Get("/:id", middlewares.Authz("assetTransactions#read"), h.GetByID)
+	txs.Put("/:id", middlewares.Authz("assetTransactions#update"), h.Update)
+	txs.Delete("/:id", middlewares.Authz("assetTransactions#delete"), h.Delete)
 }

@@ -142,9 +142,9 @@ func (h *AssetInstanceHandler) SetupRoutes(v1 fiber.Router) {
 
 	instances.Use(middlewares.Authn())
 
-	instances.Post("/", middlewares.Authz("asset_instances#create"), h.Create)
-	instances.Get("/", middlewares.Authz("asset_instances#read"), h.Read)
-	instances.Get("/:id", middlewares.Authz("asset_instances#read"), h.GetByID)
-	instances.Put("/:id", middlewares.Authz("asset_instances#update"), h.Update)
-	instances.Delete("/:id", middlewares.Authz("asset_instances#delete"), h.Delete)
+	instances.Post("/", middlewares.Authz("assetInstances#create"), h.Create)
+	instances.Get("/", middlewares.Authz("assetInstances#read"), h.Read)
+	instances.Get("/:id", middlewares.Authz("assetInstances#read"), h.GetByID)
+	instances.Put("/:id", middlewares.Authz("assetInstances#update"), h.Update)
+	instances.Delete("/:id", middlewares.Authz("assetInstances#delete"), h.Delete)
 }
