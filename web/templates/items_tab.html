@@ -112,14 +112,24 @@
                 </div>
             </div>
             
-            {{ if or ($.HasPermission "inventoryTransactions#read") ($.HasPermission "items#update") ($.HasPermission "items#delete") }}
+            {{ if or ($.HasPermission "inventoryTransactions#read") ($.HasPermission "asset_instances#read") ($.HasPermission "items#update") ($.HasPermission "items#delete") }}
             <div style="display: flex; gap: 8px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px; margin-top: auto;">
-                {{ if $.HasPermission "inventoryTransactions#read" }}
-                <button class="btn btn-secondary" style="min-height: 36px; padding: 0 8px; font-size: 12px; flex: 1;"
-                        hx-get="/inventory-transactions?itemId={{ .ID }}" hx-target="#outlet" hx-push-url="true">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                    History
-                </button>
+                {{ if eq .TrackingMode "SERIALIZED" }}
+                    {{ if $.HasPermission "asset_instances#read" }}
+                    <button class="btn btn-secondary" style="min-height: 36px; padding: 0 8px; font-size: 12px; flex: 1;"
+                            hx-get="/asset-instances?itemId={{ .ID }}" hx-target="#outlet" hx-push-url="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                        Instances
+                    </button>
+                    {{ end }}
+                {{ else }}
+                    {{ if $.HasPermission "inventoryTransactions#read" }}
+                    <button class="btn btn-secondary" style="min-height: 36px; padding: 0 8px; font-size: 12px; flex: 1;"
+                            hx-get="/inventory-transactions?itemId={{ .ID }}" hx-target="#outlet" hx-push-url="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        History
+                    </button>
+                    {{ end }}
                 {{ end }}
                 {{ if $.HasPermission "items#update" }}
                 <button class="btn btn-secondary" style="min-height: 36px; padding: 0 8px; font-size: 12px; flex: 1;"

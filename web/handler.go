@@ -17,6 +17,7 @@ type WebHandler struct {
 	locationService             services.ILocationService
 	itemService                 services.IItemService
 	inventoryTransactionService services.IInventoryTransactionService
+	assetInstanceService        services.IAssetInstanceService
 }
 
 func NewWebHandler(
@@ -26,6 +27,7 @@ func NewWebHandler(
 	locationService services.ILocationService,
 	itemService services.IItemService,
 	inventoryTransactionService services.IInventoryTransactionService,
+	assetInstanceService services.IAssetInstanceService,
 ) *WebHandler {
 	return &WebHandler{
 		userService:                 userService,
@@ -34,6 +36,7 @@ func NewWebHandler(
 		locationService:             locationService,
 		itemService:                 itemService,
 		inventoryTransactionService: inventoryTransactionService,
+		assetInstanceService:        assetInstanceService,
 	}
 }
 
