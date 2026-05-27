@@ -4,33 +4,28 @@ import (
 	"bytes"
 	"html/template"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/categories"
-	"github.com/MarcelArt/gotel/internal/v1/features/inventory_transactions"
-	"github.com/MarcelArt/gotel/internal/v1/features/items"
-	"github.com/MarcelArt/gotel/internal/v1/features/locations"
-	"github.com/MarcelArt/gotel/internal/v1/features/roles"
-	"github.com/MarcelArt/gotel/internal/v1/features/users"
+	"github.com/MarcelArt/gotel/internal/v1/services"
 	"github.com/gofiber/fiber/v3"
 )
 
 var views = make(map[string]*template.Template)
 
 type WebHandler struct {
-	userService                 users.IUserService
-	roleService                 roles.IRoleService
-	categoryService             categories.ICategoryService
-	locationService             locations.ILocationService
-	itemService                 items.IItemService
-	inventoryTransactionService inventory_transactions.IInventoryTransactionService
+	userService                 services.IUserService
+	roleService                 services.IRoleService
+	categoryService             services.ICategoryService
+	locationService             services.ILocationService
+	itemService                 services.IItemService
+	inventoryTransactionService services.IInventoryTransactionService
 }
 
 func NewWebHandler(
-	userService users.IUserService,
-	roleService roles.IRoleService,
-	categoryService categories.ICategoryService,
-	locationService locations.ILocationService,
-	itemService items.IItemService,
-	inventoryTransactionService inventory_transactions.IInventoryTransactionService,
+	userService services.IUserService,
+	roleService services.IRoleService,
+	categoryService services.ICategoryService,
+	locationService services.ILocationService,
+	itemService services.IItemService,
+	inventoryTransactionService services.IInventoryTransactionService,
 ) *WebHandler {
 	return &WebHandler{
 		userService:                 userService,

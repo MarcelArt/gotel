@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/inventory_transactions"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -33,7 +33,7 @@ type InventoryTransactionsViewModel struct {
 	ItemCode     string
 	ItemUnit     string
 	ItemPicture  string
-	ItemCounts   []inventory_transactions.ItemCount
+	ItemCounts   []models.ItemCount
 	TimeRange    string
 	StartDate    string
 	EndDate      string
@@ -167,14 +167,14 @@ func (h *WebHandler) getInventoryTransactionsViewModel(c fiber.Ctx, userID any, 
 		PrevPage:    prevPage,
 	}
 
-	var itemCounts []inventory_transactions.ItemCount
+	var itemCounts []models.ItemCount
 	if hasRange {
 		itemCounts, err = h.inventoryTransactionService.GetItemCounts(itemID, startTime, endTime)
 	} else {
 		itemCounts, err = h.inventoryTransactionService.GetItemCounts(itemID)
 	}
 	if err != nil {
-		itemCounts = []inventory_transactions.ItemCount{}
+		itemCounts = []models.ItemCount{}
 	}
 
 	return InventoryTransactionsViewModel{
@@ -279,7 +279,7 @@ func (h *WebHandler) InventoryTransactionsPost(c fiber.Ctx) error {
 		}
 	}
 
-	input := inventory_transactions.InventoryTransactionInput{
+	input := models.InventoryTransactionInput{
 		TransactionType: transactionType,
 		Quantity:        quantity,
 		Note:            note,

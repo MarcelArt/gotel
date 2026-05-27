@@ -6,7 +6,7 @@ import (
 	"html"
 	"strconv"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/categories"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -95,7 +95,7 @@ func (h *WebHandler) CategoriesPost(c fiber.Ctx) error {
 	value := c.FormValue("value")
 	description := c.FormValue("description")
 
-	input := categories.CategoryInput{
+	input := models.CategoryInput{
 		Value:       value,
 		Description: description,
 	}
@@ -167,7 +167,7 @@ func (h *WebHandler) CategoriesPut(c fiber.Ctx) error {
 	value := c.FormValue("value")
 	description := c.FormValue("description")
 
-	input := categories.CategoryInput{
+	input := models.CategoryInput{
 		Value:       value,
 		Description: description,
 	}

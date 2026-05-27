@@ -5,13 +5,8 @@ import (
 	"html/template"
 
 	"github.com/MarcelArt/gotel/internal/configs"
-	"github.com/MarcelArt/gotel/internal/v1/features/categories"
-	"github.com/MarcelArt/gotel/internal/v1/features/inventory_transactions"
-	"github.com/MarcelArt/gotel/internal/v1/features/items"
-	"github.com/MarcelArt/gotel/internal/v1/features/locations"
-	"github.com/MarcelArt/gotel/internal/v1/features/roles"
-	"github.com/MarcelArt/gotel/internal/v1/features/user_roles"
-	"github.com/MarcelArt/gotel/internal/v1/features/users"
+	"github.com/MarcelArt/gotel/internal/v1/repositories"
+	"github.com/MarcelArt/gotel/internal/v1/services"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -34,20 +29,20 @@ func SetupRoutes(app *fiber.App) {
 	views["unauthorized"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/unauthorized_tab.html"))
 
 	// Instantiate services
-	uRepo := users.NewUserRepo(configs.DB)
-	rRepo := roles.NewRoleRepo(configs.DB)
-	urRepo := user_roles.NewUserRoleRepo(configs.DB)
-	cRepo := categories.NewCategoryRepo(configs.DB)
-	locRepo := locations.NewLocationRepo(configs.DB)
-	itemRepo := items.NewItemRepo(configs.DB)
-	itRepo := inventory_transactions.NewInventoryTransactionRepo(configs.DB)
+	uRepo := repositories.NewUserRepo(configs.DB)
+	rRepo := repositories.NewRoleRepo(configs.DB)
+	urRepo := repositories.NewUserRoleRepo(configs.DB)
+	cRepo := repositories.NewCategoryRepo(configs.DB)
+	locRepo := repositories.NewLocationRepo(configs.DB)
+	itemRepo := repositories.NewItemRepo(configs.DB)
+	itRepo := repositories.NewInventoryTransactionRepo(configs.DB)
 
-	uService := users.NewUserService(uRepo, urRepo)
-	rService := roles.NewRoleService(rRepo)
-	cService := categories.NewCategoryService(cRepo)
-	locService := locations.NewLocationService(locRepo)
-	itemService := items.NewItemService(itemRepo)
-	itService := inventory_transactions.NewInventoryTransactionService(itRepo)
+	uService := services.NewUserService(configs.DB, uRepo, urRepo)
+	rService := services.NewRoleService(rRepo)
+	cService := services.NewCategoryService(cRepo)
+	locService := services.NewLocationService(locRepo)
+	itemService := services.NewItemService(itemRepo)
+	itService := services.NewInventoryTransactionService(itRepo)
 
 	h := NewWebHandler(uService, rService, cService, locService, itemService, itService)
 

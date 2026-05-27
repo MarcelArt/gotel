@@ -6,7 +6,7 @@ import (
 	"html"
 	"strconv"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/locations"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -98,7 +98,7 @@ func (h *WebHandler) LocationsPost(c fiber.Ctx) error {
 	description := c.FormValue("description")
 	isVirtual := c.FormValue("isVirtual") == "on"
 
-	input := locations.LocationInput{
+	input := models.LocationInput{
 		Value:       value,
 		Description: description,
 		IsVirtual:   isVirtual,
@@ -173,7 +173,7 @@ func (h *WebHandler) LocationsPut(c fiber.Ctx) error {
 	description := c.FormValue("description")
 	isVirtual := c.FormValue("isVirtual") == "on"
 
-	input := locations.LocationInput{
+	input := models.LocationInput{
 		Value:       value,
 		Description: description,
 		IsVirtual:   isVirtual,

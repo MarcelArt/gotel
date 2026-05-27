@@ -7,7 +7,7 @@ import (
 
 	"github.com/MarcelArt/gotel/internal/entities"
 	"github.com/MarcelArt/gotel/internal/enums"
-	"github.com/MarcelArt/gotel/internal/v1/features/roles"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/MarcelArt/gotel/pkg/jsonb"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/datatypes"
@@ -174,7 +174,7 @@ func (h *WebHandler) RolesPost(c fiber.Ctx) error {
 	permsBytes, err := json.Marshal(selectedPerms)
 	var createErr error
 	if err == nil {
-		roleInput := roles.RoleInput{
+		roleInput := models.RoleInput{
 			Name:        name,
 			Description: description,
 			Permissions: jsonb.JSONB[[]string]{
@@ -264,7 +264,7 @@ func (h *WebHandler) RolesPut(c fiber.Ctx) error {
 	permsBytes, err := json.Marshal(selectedPerms)
 	var updateErr error
 	if err == nil {
-		roleInput := roles.RoleInput{
+		roleInput := models.RoleInput{
 			Name:        name,
 			Description: description,
 			Permissions: jsonb.JSONB[[]string]{

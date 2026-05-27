@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/MarcelArt/gotel/internal/configs"
-	v1 "github.com/MarcelArt/gotel/internal/v1"
+	"github.com/MarcelArt/gotel/internal/v1/routes"
 	"github.com/MarcelArt/gotel/web"
 	"github.com/gofiber/contrib/v3/swaggerui"
 	"github.com/gofiber/fiber/v3"
@@ -52,7 +52,7 @@ to quickly create a Cobra application.`,
 			TimeZone:   "Local",
 		}))
 
-		v1.SetupRoutes(api)
+		routes.SetupRoutes(api)
 		web.SetupRoutes(app)
 
 		port := fmt.Sprintf(":%s", configs.Env.PORT)

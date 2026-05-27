@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"strconv"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/users"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -97,7 +97,7 @@ func (h *WebHandler) UsersPost(c fiber.Ctx) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")
 
-	userInput := users.UserInput{
+	userInput := models.UserInput{
 		Username: username,
 		Email:    email,
 		Password: password,
@@ -195,7 +195,7 @@ func (h *WebHandler) UsersPut(c fiber.Ctx) error {
 
 	var updateErr error
 	if username != "" && email != "" {
-		userInput := users.UserInput{
+		userInput := models.UserInput{
 			Username: username,
 			Email:    email,
 			Password: password,

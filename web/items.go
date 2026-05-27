@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MarcelArt/gotel/internal/v1/features/items"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -129,7 +129,7 @@ func (h *WebHandler) ItemsPost(c fiber.Ctx) error {
 		return h.renderTab(c, "items", vm)
 	}
 
-	input := items.ItemInput{
+	input := models.ItemInput{
 		Code:         code,
 		Name:         name,
 		TrackingMode: trackingMode,
@@ -252,7 +252,7 @@ func (h *WebHandler) ItemsPut(c fiber.Ctx) error {
 		return h.renderTab(c, "items", vm)
 	}
 
-	input := items.ItemInput{
+	input := models.ItemInput{
 		Code:         code,
 		Name:         name,
 		TrackingMode: trackingMode,

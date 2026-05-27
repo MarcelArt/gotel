@@ -6,11 +6,11 @@ import (
 
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/enums"
-	"github.com/MarcelArt/gotel/internal/v1/features/users"
+	"github.com/MarcelArt/gotel/internal/v1/services"
 	"github.com/gofiber/fiber/v3"
 )
 
-func WebAuth(userService users.IUserService) fiber.Handler {
+func WebAuth(userService services.IUserService) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		path := c.Path()
 

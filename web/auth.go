@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/MarcelArt/gotel/internal/common"
-	"github.com/MarcelArt/gotel/internal/v1/features/users"
+	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
+
 
 // LoginViewModel represents the data required to render the login view.
 type LoginViewModel struct {
@@ -53,7 +54,7 @@ func (h *WebHandler) LoginPost(c fiber.Ctx) error {
 	password := c.FormValue("password")
 	isRemember := c.FormValue("isRemember") == "on"
 
-	_, err := h.userService.Login(c, users.LoginInput{
+	_, err := h.userService.Login(c, models.LoginInput{
 		Username:   username,
 		Password:   password,
 		IsRemember: isRemember,
@@ -110,7 +111,7 @@ func (h *WebHandler) RegisterPost(c fiber.Ctx) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")
 
-	_, err := h.userService.Create(c, users.UserInput{
+	_, err := h.userService.Create(c, models.UserInput{
 		Username: username,
 		Email:    email,
 		Password: password,
