@@ -29,6 +29,7 @@ func SetupRoutes(app *fiber.App) {
 	views["settings"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/settings_tab.html"))
 	views["licenses"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/licenses_tab.html"))
 	views["unauthorized"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/unauthorized_tab.html"))
+	views["rooms"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/rooms_tab.html"))
 
 	// Instantiate services
 	uRepo := repositories.NewUserRepo(configs.DB)
@@ -40,6 +41,7 @@ func SetupRoutes(app *fiber.App) {
 	itRepo := repositories.NewInventoryTransactionRepo(configs.DB)
 	aiRepo := repositories.NewAssetInstanceRepo(configs.DB)
 	atRepo := repositories.NewAssetTransactionRepo(configs.DB)
+	roomRepo := repositories.NewRoomRepo(configs.DB)
 
 	uService := services.NewUserService(configs.DB, uRepo, urRepo)
 	rService := services.NewRoleService(rRepo)
@@ -49,8 +51,9 @@ func SetupRoutes(app *fiber.App) {
 	itService := services.NewInventoryTransactionService(itRepo)
 	aiService := services.NewAssetInstanceService(aiRepo)
 	atService := services.NewAssetTransactionService(atRepo)
+	roomService := services.NewRoomService(roomRepo)
 
-	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService, atService)
+	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService, atService, roomService)
 
 	// Register routes
 	app.Get("/login", h.LoginGet)
@@ -120,6 +123,13 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Get("/asset-transactions/:id/edit", h.WebAuthz("assetTransactions#update"), h.AssetTransactionsEditGet)
 	authGroup.Put("/asset-transactions/:id", h.WebAuthz("assetTransactions#update"), h.AssetTransactionsPut)
 	authGroup.Delete("/asset-transactions/:id", h.WebAuthz("assetTransactions#delete"), h.AssetTransactionsDelete)
+
+	// Rooms routes
+	authGroup.Get("/rooms", h.WebAuthz("rooms#read"), h.RoomsGet)
+	authGroup.Post("/rooms", h.WebAuthz("rooms#create"), h.RoomsPost)
+	authGroup.Get("/rooms/:id/edit", h.WebAuthz("rooms#update"), h.RoomsEditGet)
+	authGroup.Put("/rooms/:id", h.WebAuthz("rooms#update"), h.RoomsPut)
+	authGroup.Delete("/rooms/:id", h.WebAuthz("rooms#delete"), h.RoomsDelete)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)

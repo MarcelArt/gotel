@@ -66,6 +66,11 @@ var AvailablePermissions = []PermissionDefinition{
 	{"assetTransactions#read", "Read Asset Transactions", "Allows listing and viewing asset transactions"},
 	{"assetTransactions#update", "Update Asset Transactions", "Allows updating asset transactions"},
 	{"assetTransactions#delete", "Delete Asset Transactions", "Allows deleting asset transactions"},
+
+	{"rooms#create", "Create Rooms", "Allows creating new rooms"},
+	{"rooms#read", "Read Rooms", "Allows listing and viewing rooms"},
+	{"rooms#update", "Update Rooms", "Allows updating rooms"},
+	{"rooms#delete", "Delete Rooms", "Allows deleting rooms"},
 }
 
 type RoleWebViewModel struct {

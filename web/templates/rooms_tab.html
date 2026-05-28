@@ -1,0 +1,205 @@
+{{ define "outlet" }}
+<div x-data="{ showCreateModal: false }">
+    <header class="main-header">
+        <div>
+            <h1 class="title-md">Rooms Directory</h1>
+            <p class="body-sm" style="margin-top: 4px;">Monitor and manage hotel rooms, floors, and housekeeping readiness.</p>
+        </div>
+    </header>
+
+    <!-- Success and Error Alerts -->
+    {{ if .Success }}
+    <div class="alert alert-success" style="margin-bottom: 24px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <span>{{ .Success }}</span>
+    </div>
+    {{ end }}
+    {{ if .Error }}
+    <div class="alert" style="margin-bottom: 24px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <span>{{ .Error }}</span>
+    </div>
+    {{ end }}
+
+    <!-- Rooms Grid -->
+    <div class="grid-cols-3">
+        {{ range .Rooms }}
+        <div class="dashboard-card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <h3 class="card-title" style="margin-bottom: 0; font-size: 18px;">Room {{ .RoomNumber }}</h3>
+                    <span class="badge" style="background-color: rgba(185, 200, 222, 0.08); border-color: rgba(185, 200, 222, 0.15); color: var(--color-secondary);">ID: {{ .ID }}</span>
+                </div>
+                
+                <div class="badge-list" style="margin-top: 0; margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    {{ if eq .Status "VACANT" }}
+                    <span class="badge" style="background-color: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; font-size: 11px;">VACANT</span>
+                    {{ else if eq .Status "OCCUPIED" }}
+                    <span class="badge" style="background-color: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 2px 8px; font-size: 11px;">OCCUPIED</span>
+                    {{ else if eq .Status "DIRTY" }}
+                    <span class="badge" style="background-color: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.15); color: #f87171; padding: 2px 8px; font-size: 11px;">DIRTY</span>
+                    {{ else if eq .Status "CLEANING" }}
+                    <span class="badge" style="background-color: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 8px; font-size: 11px;">CLEANING</span>
+                    {{ else }}
+                    <span class="badge" style="background-color: rgba(185, 200, 222, 0.08); border-color: rgba(185, 200, 222, 0.15); color: var(--color-secondary); padding: 2px 8px; font-size: 11px;">{{ .Status }}</span>
+                    {{ end }}
+                </div>
+
+                <p class="body-sm" style="color: var(--color-secondary); margin-bottom: 16px; line-height: 1.4;">
+                    Located on Floor: <strong style="color: white;">{{ .Floor }}</strong>
+                </p>
+            </div>
+            
+            {{ if or ($.HasPermission "rooms#update") ($.HasPermission "rooms#delete") }}
+            <div style="display: flex; gap: 12px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px; margin-top: auto;">
+                {{ if $.HasPermission "rooms#update" }}
+                <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1;"
+                        hx-get="/rooms/{{ .ID }}/edit" hx-target="#modal-container">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Edit
+                </button>
+                {{ end }}
+                {{ if $.HasPermission "rooms#delete" }}
+                <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1; border-color: rgba(255, 180, 171, 0.2); color: var(--color-error);"
+                        hx-delete="/rooms/{{ .ID }}" hx-confirm="Are you sure you want to delete room '{{ .RoomNumber }}'?" hx-target="#outlet">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    Delete
+                </button>
+                {{ end }}
+            </div>
+            {{ end }}
+        </div>
+        {{ else }}
+        <div class="dashboard-card" style="text-align: center; padding: 60px 24px; grid-column: 1 / -1;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(185, 200, 222, 0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; color: var(--color-primary);"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14M2 20h20M14 12v.01"/></svg>
+            <h3>No Rooms Found</h3>
+            <p class="body-sm" style="margin-top: 8px; max-width: 400px; margin-left: auto; margin-right: auto;">There are no rooms currently configured.</p>
+        </div>
+        {{ end }}
+    </div>
+
+    <!-- Pagination Controls -->
+    {{ if gt .Pagination.TotalPages 1 }}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding: 16px 24px; border: 1px solid rgba(185, 200, 222, 0.08); border-radius: var(--rounded-lg); background: rgba(23, 31, 51, 0.25); backdrop-filter: blur(8px);">
+        <div class="body-sm" style="color: var(--color-secondary);">
+            Showing page <strong style="color: white;">{{ .Pagination.CurrentPage }}</strong> of <strong style="color: white;">{{ .Pagination.TotalPages }}</strong> (<strong style="color: white;">{{ .Pagination.Total }}</strong> total rooms)
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.First }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.First }}disabled{{ else }}
+                    hx-get="/rooms?page={{ .Pagination.PrevPage }}&size={{ .Pagination.Size }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; display: inline-block; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span style="display: inline-block; vertical-align: middle;">Previous</span>
+            </button>
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.Last }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.Last }}disabled{{ else }}
+                    hx-get="/rooms?page={{ .Pagination.NextPage }}&size={{ .Pagination.Size }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <span style="display: inline-block; vertical-align: middle;">Next</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; display: inline-block; vertical-align: middle;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+    {{ end }}
+
+    <!-- Create Room Modal -->
+    <div class="modal-backdrop" x-show="showCreateModal" x-cloak style="animation: fadeIn 0.2s ease;">
+        <div class="glass-card" @click.away="showCreateModal = false" style="width: 100%; max-width: 500px; border-color: rgba(192, 193, 255, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(185, 200, 222, 0.08); padding-bottom: 16px;">
+                <h2 class="title-md" style="font-size: 20px;">Create New Room</h2>
+                <button type="button" @click="showCreateModal = false" style="background: none; border: none; color: var(--color-secondary); cursor: pointer; font-size: 24px; padding: 4px; line-height: 1;">&times;</button>
+            </div>
+            
+            <form hx-post="/rooms" hx-target="#outlet" @submit="showCreateModal = false">
+                <div class="form-group">
+                    <label for="create-roomNumber">Room Number</label>
+                    <input type="text" id="create-roomNumber" name="roomNumber" class="form-control" placeholder="e.g. 101, 205-A" required>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="create-floor">Floor</label>
+                    <input type="text" id="create-floor" name="floor" class="form-control" placeholder="e.g. 1st Floor, Penthouse" required>
+                </div>
+
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="create-status">Room Status</label>
+                    <select id="create-status" name="status" class="form-control" required style="width: 100%; min-height: 40px; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 8px 40px 8px 12px; border-radius: var(--rounded-default); cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23b9c8de%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 16px center; background-size: 14px;">
+                        <option value="VACANT" style="background-color: #0f172a; color: white;">VACANT</option>
+                        <option value="OCCUPIED" style="background-color: #0f172a; color: white;">OCCUPIED</option>
+                        <option value="DIRTY" style="background-color: #0f172a; color: white;">DIRTY</option>
+                        <option value="CLEANING" style="background-color: #0f172a; color: white;">CLEANING</option>
+                        <option value="OUT_OF_ORDER" style="background-color: #0f172a; color: white;">OUT OF ORDER</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 16px; margin-top: 32px; border-top: 1px solid rgba(185, 200, 222, 0.08); padding-top: 20px;">
+                    <button type="button" class="btn btn-secondary" @click="showCreateModal = false" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Create Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Container where edit modal gets swapped in -->
+    <div id="modal-container"></div>
+
+    <!-- Floating Action Button (FAB) -->
+    {{ if .HasPermission "rooms#create" }}
+    <div class="fab-container">
+        <span class="fab-tooltip">Add Room</span>
+        <button class="fab-button" @click="showCreateModal = true" aria-label="Add Room">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ define "edit_room_modal" }}
+<div class="modal-backdrop" x-data="{ open: true }" x-show="open" style="animation: fadeIn 0.2s ease;">
+    <div class="glass-card" @click.away="open = false" style="width: 100%; max-width: 500px; border-color: rgba(192, 193, 255, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(185, 200, 222, 0.08); padding-bottom: 16px;">
+            <h2 class="title-md" style="font-size: 20px;">Edit Room</h2>
+            <button type="button" @click="open = false" style="background: none; border: none; color: var(--color-secondary); cursor: pointer; font-size: 24px; padding: 4px; line-height: 1;">&times;</button>
+        </div>
+        
+        <form hx-put="/rooms/{{ .Room.ID }}" hx-target="#outlet" @submit="open = false">
+            <div class="form-group">
+                <label for="edit-roomNumber">Room Number</label>
+                <input type="text" id="edit-roomNumber" name="roomNumber" class="form-control" value="{{ .Room.RoomNumber }}" required>
+            </div>
+            
+            <div class="form-group" style="margin-top: 16px;">
+                <label for="edit-floor">Floor</label>
+                <input type="text" id="edit-floor" name="floor" class="form-control" value="{{ .Room.Floor }}" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 16px;">
+                <label for="edit-status">Room Status</label>
+                <select id="edit-status" name="status" class="form-control" required style="width: 100%; min-height: 40px; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 8px 40px 8px 12px; border-radius: var(--rounded-default); cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23b9c8de%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 16px center; background-size: 14px;">
+                    <option value="VACANT" {{ if eq .Room.Status "VACANT" }}selected{{ end }} style="background-color: #0f172a; color: white;">VACANT</option>
+                    <option value="OCCUPIED" {{ if eq .Room.Status "OCCUPIED" }}selected{{ end }} style="background-color: #0f172a; color: white;">OCCUPIED</option>
+                    <option value="DIRTY" {{ if eq .Room.Status "DIRTY" }}selected{{ end }} style="background-color: #0f172a; color: white;">DIRTY</option>
+                    <option value="CLEANING" {{ if eq .Room.Status "CLEANING" }}selected{{ end }} style="background-color: #0f172a; color: white;">CLEANING</option>
+                    <option value="OUT_OF_ORDER" {{ if eq .Room.Status "OUT_OF_ORDER" }}selected{{ end }} style="background-color: #0f172a; color: white;">OUT OF ORDER</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 16px; margin-top: 32px; border-top: 1px solid rgba(185, 200, 222, 0.08); padding-top: 20px;">
+                <button type="button" class="btn btn-secondary" @click="open = false" style="flex: 1;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{{ end }}
