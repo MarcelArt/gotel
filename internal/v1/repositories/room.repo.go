@@ -24,8 +24,19 @@ var _ IRoomRepo = &RoomRepo{}
 
 func NewRoomRepo(db *gorm.DB) *RoomRepo {
 	return &RoomRepo{
-		db:        db,
-		pageQuery: "SELECT id, room_number, floor, status FROM rooms where deleted_at isnull",
+		db: db,
+		pageQuery: `
+			select
+				r.*,
+				ht.started_at task_started_at,
+				ht.id task_id,
+				ht.assignee_id assignee_id,
+				u.username assignee
+			from rooms r 
+			left join housekeeping_tasks ht on r.id = ht.room_id and ht.deleted_at isnull and ht.completed_at isnull
+			left join users u on ht.assignee_id = u.id 
+			where r.deleted_at isnull
+		`,
 	}
 }
 
