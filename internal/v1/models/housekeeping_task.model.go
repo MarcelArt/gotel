@@ -26,4 +26,8 @@ type HousekeepingTaskPage struct {
 	AssigneeID  uint       `json:"assigneeId"`
 	AssignerID  uint       `json:"assignerId"`
 	RoomID      uint       `json:"roomId"`
+	Assignee    string     `json:"assignee"`
+	Assigner    string     `json:"assigner"`
+	RoomFloor   string     `json:"roomFloor"`
+	RoomNumber  string     `json:"roomNumber"`
 }

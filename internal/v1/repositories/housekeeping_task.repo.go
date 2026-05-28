@@ -25,8 +25,20 @@ var _ IHousekeepingTaskRepo = &HousekeepingTaskRepo{}
 
 func NewHousekeepingTaskRepo(db *gorm.DB) *HousekeepingTaskRepo {
 	return &HousekeepingTaskRepo{
-		db:        db,
-		pageQuery: "SELECT id, priority, started_at, completed_at, note, assignee_id, assigner_id, room_id FROM housekeeping_tasks where deleted_at isnull",
+		db: db,
+		pageQuery: `
+			SELECT 
+				ht.*,
+				ue.username assignee,
+				ur.username assigner,
+				r.floor room_floor,
+				r.room_number room_number
+			FROM housekeeping_tasks ht 
+			join users ue on ht.assignee_id = ue.id
+			join users ur on ht.assigner_id = ur.id
+			join rooms r on ht.room_id = r.id 
+			where ht.deleted_at isnull
+		`,
 	}
 }
 
