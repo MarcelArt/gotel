@@ -7,6 +7,7 @@ import (
 	"github.com/MarcelArt/gotel/internal/common"
 	"github.com/MarcelArt/gotel/internal/configs"
 	"github.com/MarcelArt/gotel/internal/entities"
+	"github.com/MarcelArt/gotel/internal/enums"
 	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/MarcelArt/gotel/internal/v1/repositories"
 	"github.com/gofiber/fiber/v3"
@@ -67,7 +68,7 @@ func (s *RoomService) AssignCleaning(c common.Context, taskInput models.Housekee
 		return fmt.Errorf("room is already assigned to a cleaning task")
 	}
 
-	room := models.RoomInput{Status: "DIRTY"}
+	room := models.RoomInput{Status: enums.RoomDirty}
 	if err := repo.Update(c, taskInput.RoomID, room); err != nil {
 		return fmt.Errorf("failed updating room: %w", err)
 	}
