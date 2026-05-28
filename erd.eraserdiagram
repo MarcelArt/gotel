@@ -72,3 +72,27 @@ asset_transactions.location_id > locations.id
 asset_transactions.instance_id > asset_instances.id
 asset_transactions.actor_id > users.id
 // assets end
+
+// housekeeping start
+rooms {
+  id uint pk // gorm.Model
+  room_number string
+  floor string
+  status string // VACANT, OCCUPIED, DIRTY, CLEANING, OUT_OF_ORDER
+}
+
+housekeeping_tasks {
+  id uint pk // gorm.Model
+  priority uint // Lower number is most urgent
+  started_at timestampz null
+  completed_at timestampz null
+  note string
+  assignee_id uint fk
+  assigner_id uint fk
+  room_id uint fk
+}
+
+housekeeping_tasks.assignee_id > users.id
+housekeeping_tasks.assigner_id > users.id
+housekeeping_tasks.room_id > rooms.id
+// housekeeping end

@@ -50,6 +50,8 @@ func MigrateDB() error {
 		entities.InventoryTransaction{},
 		entities.AssetInstance{},
 		entities.AssetTransaction{},
+		entities.Room{},
+		entities.HousekeepingTask{},
 	)
 	fmt.Println("Database Migrated")
 
@@ -66,6 +68,8 @@ func MigrateDB() error {
 func DropDB() error {
 	db := DB
 	err := db.Migrator().DropTable(
+		entities.HousekeepingTask{},
+		entities.Room{},
 		entities.AssetTransaction{},
 		entities.AssetInstance{},
 		entities.InventoryTransaction{},

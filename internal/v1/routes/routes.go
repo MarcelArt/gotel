@@ -16,4 +16,6 @@ func SetupRoutes(api fiber.Router) {
 	SetupInventoryTransactionRoutes(v1)
 	SetupAssetInstanceRoutes(v1)
 	SetupAssetTransactionRoutes(v1)
+	SetupRoomRoutes(v1)
+	SetupHousekeepingTaskRoutes(v1)
 }
