@@ -30,6 +30,7 @@ func SetupRoutes(app *fiber.App) {
 	views["licenses"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/licenses_tab.html"))
 	views["unauthorized"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/unauthorized_tab.html"))
 	views["rooms"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/rooms_tab.html"))
+	views["housekeeping_tasks"] = template.Must(template.New("").ParseFS(templatesFS, "templates/layout.html", "templates/dashboard.html", "templates/housekeeping_tasks_tab.html"))
 
 	// Instantiate services
 	uRepo := repositories.NewUserRepo(configs.DB)
@@ -42,6 +43,7 @@ func SetupRoutes(app *fiber.App) {
 	aiRepo := repositories.NewAssetInstanceRepo(configs.DB)
 	atRepo := repositories.NewAssetTransactionRepo(configs.DB)
 	roomRepo := repositories.NewRoomRepo(configs.DB)
+	htRepo := repositories.NewHousekeepingTaskRepo(configs.DB)
 
 	uService := services.NewUserService(configs.DB, uRepo, urRepo)
 	rService := services.NewRoleService(rRepo)
@@ -52,8 +54,9 @@ func SetupRoutes(app *fiber.App) {
 	aiService := services.NewAssetInstanceService(aiRepo)
 	atService := services.NewAssetTransactionService(atRepo)
 	roomService := services.NewRoomService(roomRepo)
+	htService := services.NewHousekeepingTaskService(htRepo)
 
-	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService, atService, roomService)
+	h := NewWebHandler(uService, rService, cService, locService, itemService, itService, aiService, atService, roomService, htService)
 
 	// Register routes
 	app.Get("/login", h.LoginGet)
@@ -132,6 +135,9 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Delete("/rooms/:id", h.WebAuthz("rooms#delete"), h.RoomsDelete)
 	authGroup.Post("/rooms/assign-cleaning", h.WebAuthz("housekeepingTasks#create"), h.RoomsAssignCleaningPost)
 	authGroup.Get("/users/dropdown/list", h.WebAuthz("rooms#read"), h.UserDropdownListGet)
+
+	// Housekeeping Tasks routes
+	authGroup.Get("/housekeeping-tasks", h.WebAuthz("housekeepingTasks#read"), h.HousekeepingTasksGet)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)

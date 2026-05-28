@@ -1,0 +1,331 @@
+{{ define "outlet" }}
+<div>
+    <style>
+    .task-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        margin-top: 16px;
+    }
+    .task-table th, .task-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(185, 200, 222, 0.05);
+        font-size: 13px;
+    }
+    .task-table th {
+        font-weight: 600;
+        color: var(--color-secondary);
+        background-color: rgba(23, 31, 51, 0.2);
+    }
+    .task-table tr:hover td {
+        background-color: rgba(192, 193, 255, 0.02);
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
+        width: 100%;
+    }
+    @media (max-width: 768px) {
+        .task-table-wrap { display: none !important; }
+        .task-card-list { display: block !important; }
+    }
+    .task-card-list { display: none; }
+    .task-card {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(185, 200, 222, 0.06);
+    }
+    .task-card:last-child { border-bottom: none; }
+    .task-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .task-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        font-size: 12px;
+        color: var(--color-secondary);
+    }
+    .task-card-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .task-card-note {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--color-secondary);
+    }
+    </style>
+
+    <header class="main-header">
+        <div>
+            <h1 class="title-md">Housekeeping Tasks Directory</h1>
+            <p class="body-sm" style="margin-top: 4px;">Monitor and track housekeeping progress, task assignments, and completion times.</p>
+        </div>
+    </header>
+
+    <!-- Success and Error Alerts -->
+    {{ if .Success }}
+    <div class="alert alert-success" style="margin-bottom: 24px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <span>{{ .Success }}</span>
+    </div>
+    {{ end }}
+    {{ if .Error }}
+    <div class="alert" style="margin-bottom: 24px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <span>{{ .Error }}</span>
+    </div>
+    {{ end }}
+
+    <!-- Filter Toolbar Form -->
+    <div class="dashboard-card" style="padding: 20px; margin-bottom: 24px;">
+        <h3 class="card-title" style="margin-top: 0; margin-bottom: 16px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-primary);">Filter &amp; Search Tasks</h3>
+        <form hx-get="/housekeeping-tasks" hx-target="#outlet" hx-push-url="true" hx-trigger="submit, change from:select, keyup changed delay:400ms from:input[type=text]"
+              x-data="{
+                  roomNumber: '{{ .RoomNumber }}',
+                  assignee: '{{ .Assignee }}',
+                  assigner: '{{ .Assigner }}',
+                  note: '{{ .Note }}',
+                  priority: '{{ .Priority }}',
+                  status: '{{ .Status }}',
+                  get filters() {
+                      let parts = [];
+                      if (this.roomNumber) parts.push(['room_number', 'like', this.roomNumber]);
+                      if (this.assignee) parts.push(['assignee', 'like', this.assignee]);
+                      if (this.assigner) parts.push(['assigner', 'like', this.assigner]);
+                      if (this.note) parts.push(['note', 'like', this.note]);
+                      if (this.priority) parts.push(['priority', '=', Number(this.priority)]);
+                      if (this.status) {
+                          if (this.status === 'pending') {
+                              parts.push(['started_at', 'is', null]);
+                          } else if (this.status === 'in_progress') {
+                              parts.push(['started_at', 'is not', null]);
+                              parts.push(['completed_at', 'is', null]);
+                          } else if (this.status === 'completed') {
+                              parts.push(['completed_at', 'is not', null]);
+                          }
+                      }
+                      if (parts.length === 0) return '';
+                      let arr = [];
+                      for (let i = 0; i < parts.length; i++) {
+                          if (i > 0) arr.push(['and']);
+                          arr.push(parts[i]);
+                      }
+                      return JSON.stringify(arr);
+                  }
+              }">
+            <input type="hidden" name="filters" :value="filters">
+            <div class="filter-grid">
+                <!-- Room Number Filter -->
+                <div class="form-group">
+                    <label for="filter-roomNumber" style="font-size: 11px; margin-bottom: 6px;">Room Number</label>
+                    <input type="text" id="filter-roomNumber" name="roomNumber" class="form-control" placeholder="Search room..." x-model="roomNumber" style="min-height: 36px !important; font-size: 13px;">
+                </div>
+
+                <!-- Assignee Filter -->
+                <div class="form-group">
+                    <label for="filter-assignee" style="font-size: 11px; margin-bottom: 6px;">Assignee</label>
+                    <input type="text" id="filter-assignee" name="assignee" class="form-control" placeholder="Search assignee..." x-model="assignee" style="min-height: 36px !important; font-size: 13px;">
+                </div>
+
+                <!-- Assigner Filter -->
+                <div class="form-group">
+                    <label for="filter-assigner" style="font-size: 11px; margin-bottom: 6px;">Assigner</label>
+                    <input type="text" id="filter-assigner" name="assigner" class="form-control" placeholder="Search assigner..." x-model="assigner" style="min-height: 36px !important; font-size: 13px;">
+                </div>
+
+                <!-- Note Filter -->
+                <div class="form-group">
+                    <label for="filter-note" style="font-size: 11px; margin-bottom: 6px;">Task Note</label>
+                    <input type="text" id="filter-note" name="note" class="form-control" placeholder="Search note..." x-model="note" style="min-height: 36px !important; font-size: 13px;">
+                </div>
+
+                <!-- Priority Filter -->
+                <div class="form-group">
+                    <label for="filter-priority" style="font-size: 11px; margin-bottom: 6px;">Priority</label>
+                    <select id="filter-priority" name="priority" class="form-control" x-model="priority" style="min-height: 36px !important; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 6px 12px; border-radius: var(--rounded-default); cursor: pointer; font-size: 13px;">
+                        <option value="">All Priorities</option>
+                        <option value="1">1 - High / Urgent</option>
+                        <option value="2">2 - Medium</option>
+                        <option value="3">3 - Low</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="form-group">
+                    <label for="filter-status" style="font-size: 11px; margin-bottom: 6px;">Status</label>
+                    <select id="filter-status" name="status" class="form-control" x-model="status" style="min-height: 36px !important; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 6px 12px; border-radius: var(--rounded-default); cursor: pointer; font-size: 13px;">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <!-- Sort Field Filter -->
+                <div class="form-group">
+                    <label for="filter-sort" style="font-size: 11px; margin-bottom: 6px;">Sort By</label>
+                    <select id="filter-sort" name="sort" class="form-control" style="min-height: 36px !important; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 6px 12px; border-radius: var(--rounded-default); cursor: pointer; font-size: 13px;">
+                        <option value="-id" {{ if eq .Sort "-id" }}selected{{ end }}>ID / Created (Desc)</option>
+                        <option value="id" {{ if eq .Sort "id" }}selected{{ end }}>ID / Created (Asc)</option>
+                        <option value="-priority" {{ if eq .Sort "-priority" }}selected{{ end }}>Priority (Desc)</option>
+                        <option value="priority" {{ if eq .Sort "priority" }}selected{{ end }}>Priority (Asc)</option>
+                        <option value="-room_number" {{ if eq .Sort "-room_number" }}selected{{ end }}>Room Number (Desc)</option>
+                        <option value="room_number" {{ if eq .Sort "room_number" }}selected{{ end }}>Room Number (Asc)</option>
+                        <option value="-started_at" {{ if eq .Sort "-started_at" }}selected{{ end }}>Started At (Desc)</option>
+                        <option value="started_at" {{ if eq .Sort "started_at" }}selected{{ end }}>Started At (Asc)</option>
+                        <option value="-completed_at" {{ if eq .Sort "-completed_at" }}selected{{ end }}>Completed At (Desc)</option>
+                        <option value="completed_at" {{ if eq .Sort "completed_at" }}selected{{ end }}>Completed At (Asc)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px;">
+                <button type="button" class="btn btn-secondary" style="width: auto; min-height: 36px; padding: 0 16px; font-size: 13px;"
+                        hx-get="/housekeeping-tasks" hx-target="#outlet" hx-push-url="true">
+                    Clear Filters
+                </button>
+                <button type="submit" class="btn btn-primary" style="width: auto; min-height: 36px; padding: 0 16px; font-size: 13px;">
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Desktop View: Tasks Table -->
+    <div class="dashboard-card task-table-wrap" style="padding: 0; overflow-x: auto;">
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Task ID</th>
+                    <th style="width: 100px;">Room</th>
+                    <th style="width: 100px;">Priority</th>
+                    <th style="width: 120px;">Status</th>
+                    <th>Assignee</th>
+                    <th>Assigner</th>
+                    <th>Started At</th>
+                    <th>Completed At</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Tasks }}
+                <tr>
+                    <td style="font-family: monospace; color: var(--color-secondary);">#{{ .ID }}</td>
+                    <td style="color: white; font-weight: 600;">
+                        Room {{ .RoomNumber }}
+                        <span style="display: block; font-size: 10px; color: var(--color-secondary); font-weight: normal; margin-top: 2px;">{{ .RoomFloor }}</span>
+                    </td>
+                    <td>
+                        <span class="badge" style="{{ .PriorityStyle }} font-size: 11px; padding: 2px 8px;">{{ .PriorityText }}</span>
+                    </td>
+                    <td>
+                        <span class="badge" style="{{ .StatusStyle }} font-size: 11px; padding: 2px 8px;">{{ .Status }}</span>
+                    </td>
+                    <td style="color: white; font-weight: 500;">
+                        {{ .Assignee }}
+                    </td>
+                    <td style="color: var(--color-secondary);">{{ .Assigner }}</td>
+                    <td style="color: var(--color-secondary); font-size: 12px;">{{ .StartedAt }}</td>
+                    <td style="color: var(--color-secondary); font-size: 12px;">{{ .CompletedAt }}</td>
+                    <td style="color: var(--color-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ .Note }}">
+                        {{ if .Note }}{{ .Note }}{{ else }}-{{ end }}
+                    </td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 60px 24px; color: var(--color-secondary);">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(185, 200, 222, 0.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        No housekeeping tasks found matching the criteria.
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile View: Tasks Card List -->
+    <div class="dashboard-card task-card-list" style="padding: 0;">
+        {{ range .Tasks }}
+        <div class="task-card">
+            <div class="task-card-header">
+                <div>
+                    <span style="font-weight: 600; color: white; font-size: 15px;">Room {{ .RoomNumber }}</span>
+                    <span style="font-size: 11px; color: var(--color-secondary); margin-left: 6px;">#{{ .ID }}</span>
+                </div>
+                <span class="badge" style="{{ .StatusStyle }} font-size: 11px; padding: 2px 8px;">{{ .Status }}</span>
+            </div>
+            
+            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <span class="badge" style="{{ .PriorityStyle }} font-size: 10px; padding: 1px 6px;">Priority: {{ .PriorityText }}</span>
+                <span class="badge" style="background-color: rgba(185, 200, 222, 0.04); border-color: rgba(185, 200, 222, 0.08); color: var(--color-secondary); font-size: 10px; padding: 1px 6px;">{{ .RoomFloor }}</span>
+            </div>
+
+            <div class="task-card-meta" style="margin-top: 10px;">
+                <span class="task-card-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Assignee: <strong>{{ .Assignee }}</strong>
+                </span>
+                <span class="task-card-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Assigner: <strong>{{ .Assigner }}</strong>
+                </span>
+            </div>
+
+            <div class="task-card-meta" style="margin-top: 4px;">
+                <span class="task-card-meta-item">
+                    Started: <strong>{{ .StartedAt }}</strong>
+                </span>
+                <span class="task-card-meta-item">
+                    Completed: <strong>{{ .CompletedAt }}</strong>
+                </span>
+            </div>
+
+            {{ if .Note }}
+            <div class="task-card-note"><strong>Note:</strong> {{ .Note }}</div>
+            {{ end }}
+        </div>
+        {{ else }}
+        <div style="padding: 48px 20px; text-align: center; color: var(--color-secondary);">
+            No housekeeping tasks found.
+        </div>
+        {{ end }}
+    </div>
+
+    <!-- Pagination Controls -->
+    {{ if gt .Pagination.TotalPages 1 }}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding: 16px 24px; border: 1px solid rgba(185, 200, 222, 0.08); border-radius: var(--rounded-lg); background: rgba(23, 31, 51, 0.25); backdrop-filter: blur(8px);">
+        <div class="body-sm" style="color: var(--color-secondary);">
+            Showing page <strong style="color: white;">{{ .Pagination.CurrentPage }}</strong> of <strong style="color: white;">{{ .Pagination.TotalPages }}</strong> (<strong style="color: white;">{{ .Pagination.Total }}</strong> total tasks)
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.First }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.First }}disabled{{ else }}
+                    hx-get="/housekeeping-tasks?page={{ .Pagination.PrevPage }}&size={{ .Pagination.Size }}&roomNumber={{ .RoomNumber }}&assignee={{ .Assignee }}&assigner={{ .Assigner }}&note={{ .Note }}&priority={{ .Priority }}&status={{ .Status }}&sort={{ .Sort }}&filters={{ .Filters }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; display: inline-block; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span style="display: inline-block; vertical-align: middle;">Previous</span>
+            </button>
+            <button class="btn btn-secondary" 
+                    style="min-height: 36px; padding: 0 16px; font-size: 13px; {{ if .Pagination.Last }}opacity: 0.4; cursor: not-allowed;{{ end }}"
+                    {{ if .Pagination.Last }}disabled{{ else }}
+                    hx-get="/housekeeping-tasks?page={{ .Pagination.NextPage }}&size={{ .Pagination.Size }}&roomNumber={{ .RoomNumber }}&assignee={{ .Assignee }}&assigner={{ .Assigner }}&note={{ .Note }}&priority={{ .Priority }}&status={{ .Status }}&sort={{ .Sort }}&filters={{ .Filters }}" 
+                    hx-target="#outlet"
+                    hx-push-url="true"
+                    {{ end }}>
+                <span style="display: inline-block; vertical-align: middle;">Next</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; display: inline-block; vertical-align: middle;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
