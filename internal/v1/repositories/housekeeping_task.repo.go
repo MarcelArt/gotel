@@ -13,6 +13,7 @@ import (
 
 type IHousekeepingTaskRepo interface {
 	common.IBaseCrudRepo[entities.HousekeepingTask, models.HousekeepingTaskInput, models.HousekeepingTaskPage]
+	GetActiveTaskByRoomID(c common.Context, roomID any) (entities.HousekeepingTask, error)
 }
 
 type HousekeepingTaskRepo struct {
@@ -80,4 +81,13 @@ func (r *HousekeepingTaskRepo) GetByID(c common.Context, id any) (entities.House
 	task, err := gorm.G[entities.HousekeepingTask](r.db).Where("id = ?", id).First(ctx)
 
 	return task, err
+}
+
+func (r *HousekeepingTaskRepo) GetActiveTaskByRoomID(c common.Context, roomID any) (entities.HousekeepingTask, error) {
+	ctx := c.Context()
+
+	return gorm.G[entities.HousekeepingTask](r.db).
+		Where("room_id = ? and completed_at isnull", roomID).
+		Order("created_at desc").
+		First(ctx)
 }
