@@ -3,16 +3,21 @@ package web
 import (
 	"bytes"
 	"strconv"
+	"time"
 
 	"github.com/MarcelArt/gotel/internal/v1/models"
 	"github.com/gofiber/fiber/v3"
 )
 
 type RoomWebViewModel struct {
-	ID         uint
-	RoomNumber string
-	Floor      string
-	Status     string
+	ID            uint
+	RoomNumber    string
+	Floor         string
+	Status        string
+	TaskID        uint
+	TaskStartedAt *time.Time
+	AssigneeID    uint
+	Assignee      string
 }
 
 type RoomsViewModel struct {
@@ -34,10 +39,14 @@ func (h *WebHandler) getRoomsViewModel(c fiber.Ctx, userID any) (RoomsViewModel,
 	webRooms := make([]RoomWebViewModel, len(roomsList))
 	for i, r := range roomsList {
 		webRooms[i] = RoomWebViewModel{
-			ID:         r.ID,
-			RoomNumber: r.RoomNumber,
-			Floor:      r.Floor,
-			Status:     r.Status,
+			ID:            r.ID,
+			RoomNumber:    r.RoomNumber,
+			Floor:         r.Floor,
+			Status:        r.Status,
+			TaskID:        r.TaskID,
+			TaskStartedAt: r.TaskStartedAt,
+			AssigneeID:    r.AssigneeID,
+			Assignee:      r.Assignee,
 		}
 	}
 

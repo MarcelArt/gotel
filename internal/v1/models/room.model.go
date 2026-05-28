@@ -14,12 +14,12 @@ type RoomInput struct {
 }
 
 type RoomPage struct {
-	ID            uint      `json:"ID"`
-	RoomNumber    string    `json:"roomNumber"`
-	Floor         string    `json:"floor"`
-	Status        string    `json:"status"`
-	TaskID        uint      `json:"taskId"`
-	TaskStartedAt time.Time `json:"taskStartedAt"`
-	AssigneeID    uint      `json:"assigneeId"`
-	Assignee      uint      `json:"assignee"`
+	ID            uint       `json:"ID"`
+	RoomNumber    string     `json:"roomNumber"`
+	Floor         string     `json:"floor"`
+	Status        string     `json:"status"`
+	TaskID        uint       `json:"taskId"`
+	TaskStartedAt *time.Time `json:"taskStartedAt"`
+	AssigneeID    uint       `json:"assigneeId"`
+	Assignee      string     `json:"assignee"`
 }

@@ -94,12 +94,35 @@
                 <p class="body-sm" style="color: var(--color-secondary); margin-bottom: 16px; line-height: 1.4;">
                     Located on Floor: <strong style="color: white;">{{ .Floor }}</strong>
                 </p>
+
+                {{ if gt .TaskID 0 }}
+                <div style="margin-top: 12px; margin-bottom: 16px; padding: 10px 12px; border-radius: var(--rounded-default); background-color: rgba(185, 200, 222, 0.03); border: 1px solid rgba(185, 200, 222, 0.08); display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="body-xs" style="color: var(--color-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px;">Housekeeping Task</span>
+                        {{ if .TaskStartedAt }}
+                        <span class="badge" style="background-color: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 2px 6px; font-size: 10px; font-weight: 600;">IN PROGRESS</span>
+                        {{ else }}
+                        <span class="badge" style="background-color: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 6px; font-size: 10px; font-weight: 600;">PENDING</span>
+                        {{ end }}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                        <div style="display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background-color: rgba(192, 193, 255, 0.06); color: var(--color-primary);">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="body-xs" style="color: var(--color-secondary); font-size: 10px;">Assignee</span>
+                            <span style="color: white; font-size: 13px; font-weight: 500;">{{ .Assignee }}</span>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px; margin-top: auto;">
                 {{ if $.HasPermission "housekeepingTasks#create" }}
-                <button class="btn btn-primary" style="min-height: 36px; padding: 0 12px; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
-                        @click="showAssignModal = true; assignRoomId = {{ .ID }}; assignRoomNumber = '{{ .RoomNumber }}'; $dispatch('reset-assignee');">
+                <button class="btn btn-primary" 
+                        style="min-height: 36px; padding: 0 12px; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; {{ if gt .TaskID 0 }}opacity: 0.5; cursor: not-allowed;{{ end }}"
+                        {{ if gt .TaskID 0 }}disabled{{ else }}@click="showAssignModal = true; assignRoomId = {{ .ID }}; assignRoomNumber = '{{ .RoomNumber }}'; $dispatch('reset-assignee');"{{ end }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     Assign Cleaning
                 </button>
