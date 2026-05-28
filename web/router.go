@@ -130,6 +130,8 @@ func SetupRoutes(app *fiber.App) {
 	authGroup.Get("/rooms/:id/edit", h.WebAuthz("rooms#update"), h.RoomsEditGet)
 	authGroup.Put("/rooms/:id", h.WebAuthz("rooms#update"), h.RoomsPut)
 	authGroup.Delete("/rooms/:id", h.WebAuthz("rooms#delete"), h.RoomsDelete)
+	authGroup.Post("/rooms/assign-cleaning", h.WebAuthz("housekeepingTasks#create"), h.RoomsAssignCleaningPost)
+	authGroup.Get("/users/dropdown/list", h.WebAuthz("rooms#read"), h.UserDropdownListGet)
 
 	authGroup.Get("/settings", h.SettingsGet)
 	authGroup.Get("/licenses", h.LicensesGet)

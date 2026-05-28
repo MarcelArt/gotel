@@ -71,6 +71,11 @@ var AvailablePermissions = []PermissionDefinition{
 	{"rooms#read", "Read Rooms", "Allows listing and viewing rooms"},
 	{"rooms#update", "Update Rooms", "Allows updating rooms"},
 	{"rooms#delete", "Delete Rooms", "Allows deleting rooms"},
+
+	{"housekeepingTasks#create", "Create Housekeeping Tasks", "Allows creating housekeeping tasks"},
+	{"housekeepingTasks#read", "Read Housekeeping Tasks", "Allows listing and viewing housekeeping tasks"},
+	{"housekeepingTasks#update", "Update Housekeeping Tasks", "Allows updating housekeeping tasks"},
+	{"housekeepingTasks#delete", "Delete Housekeeping Tasks", "Allows deleting housekeeping tasks"},
 }
 
 type RoleWebViewModel struct {

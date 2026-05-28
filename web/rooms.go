@@ -234,3 +234,152 @@ func (h *WebHandler) RoomsDelete(c fiber.Ctx) error {
 
 	return h.renderTab(c, "rooms", vm)
 }
+
+// RoomsAssignCleaningPost handles POST /rooms/assign-cleaning requests.
+func (h *WebHandler) RoomsAssignCleaningPost(c fiber.Ctx) error {
+	userID := c.Locals("userId")
+	if userID == nil {
+		return c.Redirect().To("/login")
+	}
+
+	var assignerID uint
+	if idVal, ok := userID.(float64); ok {
+		assignerID = uint(idVal)
+	} else if idVal, ok := userID.(uint); ok {
+		assignerID = idVal
+	}
+
+	roomIdStr := c.FormValue("roomId")
+	roomId, err := strconv.ParseUint(roomIdStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Room ID")
+	}
+
+	priorityStr := c.FormValue("priority")
+	priority, err := strconv.ParseUint(priorityStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Priority")
+	}
+
+	assigneeIdStr := c.FormValue("assigneeId")
+	assigneeId, err := strconv.ParseUint(assigneeIdStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Assignee ID")
+	}
+
+	note := c.FormValue("note")
+
+	input := models.HousekeepingTaskInput{
+		RoomID:     uint(roomId),
+		Priority:   uint(priority),
+		AssigneeID: uint(assigneeId),
+		AssignerID: assignerID,
+		Note:       note,
+	}
+
+	assignErr := h.roomService.AssignCleaning(c, input)
+
+	c.Request().Header.SetMethod(fiber.MethodGet)
+	vm, err := h.getRoomsViewModel(c, userID)
+	if err != nil {
+		return h.LogoutPost(c)
+	}
+
+	if assignErr != nil {
+		vm.Error = "Failed to assign cleaning task: " + assignErr.Error()
+	} else {
+		vm.Success = "Cleaning task assigned successfully!"
+	}
+
+	return h.renderTab(c, "rooms", vm)
+}
+
+// UserDropdownListGet handles GET /users/dropdown/list requests.
+func (h *WebHandler) UserDropdownListGet(c fiber.Ctx) error {
+	search := c.Query("search")
+	pageStr := c.Query("page")
+	page, _ := strconv.ParseInt(pageStr, 10, 64)
+	if page < 0 {
+		page = 0
+	}
+
+	originalFilters := string(c.Request().URI().QueryArgs().Peek("filters"))
+	originalPage := string(c.Request().URI().QueryArgs().Peek("page"))
+	originalSize := string(c.Request().URI().QueryArgs().Peek("size"))
+
+	c.Request().URI().QueryArgs().Set("page", strconv.FormatInt(page, 10))
+	c.Request().URI().QueryArgs().Set("size", "10")
+	if search != "" {
+		c.Request().URI().QueryArgs().Set("filters", `[["username", "like", "`+search+`"]]`)
+	} else {
+		c.Request().URI().QueryArgs().Del("filters")
+	}
+
+	pageInfo, usersList := h.userService.Read(c)
+
+	// Restore original query args
+	if originalFilters != "" {
+		c.Request().URI().QueryArgs().Set("filters", originalFilters)
+	} else {
+		c.Request().URI().QueryArgs().Del("filters")
+	}
+	if originalPage != "" {
+		c.Request().URI().QueryArgs().Set("page", originalPage)
+	} else {
+		c.Request().URI().QueryArgs().Del("page")
+	}
+	if originalSize != "" {
+		c.Request().URI().QueryArgs().Set("size", originalSize)
+	} else {
+		c.Request().URI().QueryArgs().Del("size")
+	}
+
+	type UserItem struct {
+		ID       uint
+		Username string
+		Email    string
+	}
+	items := make([]UserItem, len(usersList))
+	for i, u := range usersList {
+		items[i] = UserItem{
+			ID:       u.ID,
+			Username: u.Username,
+			Email:    u.Email,
+		}
+	}
+
+	prevPage := pageInfo.Page - 1
+	if prevPage < 0 {
+		prevPage = 0
+	}
+
+	viewModel := struct {
+		Items      []UserItem
+		Search     string
+		Pagination PaginationInfo
+	}{
+		Items:  items,
+		Search: search,
+		Pagination: PaginationInfo{
+			Page:       pageInfo.Page,
+			Size:       pageInfo.Size,
+			TotalPages: pageInfo.TotalPages,
+			Total:      pageInfo.Total,
+			Last:       pageInfo.Last,
+			First:      pageInfo.First,
+			NextPage:   pageInfo.Page + 1,
+			PrevPage:   prevPage,
+		},
+	}
+
+	t, ok := views["rooms"]
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).SendString("Template not found")
+	}
+	var buf bytes.Buffer
+	if err := t.ExecuteTemplate(&buf, "users_dropdown_items", viewModel); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	c.Type("html")
+	return c.Send(buf.Bytes())
+}

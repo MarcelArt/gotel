@@ -1,5 +1,51 @@
 {{ define "outlet" }}
-<div x-data="{ showCreateModal: false }">
+<div x-data="{ showCreateModal: false, showAssignModal: false, assignRoomId: null, assignRoomNumber: '' }">
+    <style>
+    .dropdown-menu-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 4px;
+        border: 1px solid rgba(185, 200, 222, 0.12);
+        border-radius: var(--rounded-default);
+        background-color: rgba(15, 23, 42, 0.98);
+    }
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        text-align: left;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+    .dropdown-item:hover {
+        background: rgba(192, 193, 255, 0.08);
+        color: var(--color-primary);
+    }
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .htmx-indicator {
+        display: none;
+    }
+    .htmx-request .htmx-indicator {
+        display: block;
+    }
+    .htmx-request.htmx-indicator {
+        display: block;
+    }
+    </style>
+
     <header class="main-header">
         <div>
             <h1 class="title-md">Rooms Directory</h1>
@@ -24,7 +70,7 @@
     <!-- Rooms Grid -->
     <div class="grid-cols-3">
         {{ range .Rooms }}
-        <div class="dashboard-card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+        <div class="dashboard-card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                     <h3 class="card-title" style="margin-bottom: 0; font-size: 18px;">Room {{ .RoomNumber }}</h3>
@@ -50,24 +96,34 @@
                 </p>
             </div>
             
-            {{ if or ($.HasPermission "rooms#update") ($.HasPermission "rooms#delete") }}
-            <div style="display: flex; gap: 12px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px; margin-top: auto;">
-                {{ if $.HasPermission "rooms#update" }}
-                <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1;"
-                        hx-get="/rooms/{{ .ID }}/edit" hx-target="#modal-container">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    Edit
+            <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(185, 200, 222, 0.05); padding-top: 16px; margin-top: auto;">
+                {{ if $.HasPermission "housekeepingTasks#create" }}
+                <button class="btn btn-primary" style="min-height: 36px; padding: 0 12px; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
+                        @click="showAssignModal = true; assignRoomId = {{ .ID }}; assignRoomNumber = '{{ .RoomNumber }}'; $dispatch('reset-assignee');">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Assign Cleaning
                 </button>
                 {{ end }}
-                {{ if $.HasPermission "rooms#delete" }}
-                <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1; border-color: rgba(255, 180, 171, 0.2); color: var(--color-error);"
-                        hx-delete="/rooms/{{ .ID }}" hx-confirm="Are you sure you want to delete room '{{ .RoomNumber }}'?" hx-target="#outlet">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                    Delete
-                </button>
+                
+                {{ if or ($.HasPermission "rooms#update") ($.HasPermission "rooms#delete") }}
+                <div style="display: flex; gap: 12px; width: 100%;">
+                    {{ if $.HasPermission "rooms#update" }}
+                    <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1;"
+                            hx-get="/rooms/{{ .ID }}/edit" hx-target="#modal-container">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Edit
+                    </button>
+                    {{ end }}
+                    {{ if $.HasPermission "rooms#delete" }}
+                    <button class="btn btn-secondary" style="min-height: 36px; padding: 0 12px; font-size: 13px; flex: 1; border-color: rgba(255, 180, 171, 0.2); color: var(--color-error);"
+                            hx-delete="/rooms/{{ .ID }}" hx-confirm="Are you sure you want to delete room '{{ .RoomNumber }}'?" hx-target="#outlet">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        Delete
+                    </button>
+                    {{ end }}
+                </div>
                 {{ end }}
             </div>
-            {{ end }}
         </div>
         {{ else }}
         <div class="dashboard-card" style="text-align: center; padding: 60px 24px; grid-column: 1 / -1;">
@@ -147,6 +203,83 @@
         </div>
     </div>
 
+    <!-- Assign Cleaning Modal -->
+    <div class="modal-backdrop" x-show="showAssignModal" x-cloak style="animation: fadeIn 0.2s ease; z-index: 9999;">
+        <div class="glass-card" @click.away="showAssignModal = false" style="width: 100%; max-width: 500px; border-color: rgba(192, 193, 255, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(185, 200, 222, 0.08); padding-bottom: 16px;">
+                <h2 class="title-md" style="font-size: 20px;">Assign Cleaning: Room <span x-text="assignRoomNumber"></span></h2>
+                <button type="button" @click="showAssignModal = false" style="background: none; border: none; color: var(--color-secondary); cursor: pointer; font-size: 24px; padding: 4px; line-height: 1;">&times;</button>
+            </div>
+            
+            <form hx-post="/rooms/assign-cleaning" hx-target="#outlet" @submit="showAssignModal = false">
+                <!-- Hidden input for Room ID -->
+                <input type="hidden" name="roomId" :value="assignRoomId">
+                
+                <div class="form-group">
+                    <label for="assign-priority">Priority</label>
+                    <select id="assign-priority" name="priority" class="form-control" required style="width: 100%; min-height: 40px; background-color: rgba(15, 23, 42, 0.6); color: white; border: 1px solid rgba(185, 200, 222, 0.12); padding: 8px 40px 8px 12px; border-radius: var(--rounded-default); cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23b9c8de%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 16px center; background-size: 14px;">
+                        <option value="1" style="background-color: #0f172a; color: white;">1 - High / Urgent</option>
+                        <option value="2" style="background-color: #0f172a; color: white;" selected>2 - Medium</option>
+                        <option value="3" style="background-color: #0f172a; color: white;">3 - Low</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;" 
+                     x-data="{ open: false, selectedName: 'Select Assignee...' }"
+                     @reset-assignee.window="selectedName = 'Select Assignee...'; open = false; document.getElementById('assign-assigneeId').value = ''; if (document.getElementById('assignee-search')) { document.getElementById('assignee-search').value = ''; htmx.trigger('#assignee-search', 'keyup'); }">
+                    <label>Assignee</label>
+                    <input type="hidden" name="assigneeId" id="assign-assigneeId" required>
+                    
+                    <div style="position: relative;">
+                        <button type="button" @click="open = !open" class="form-control" style="text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; min-height: 40px;">
+                            <span x-text="selectedName"></span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false" class="dropdown-menu-list" style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; margin-top: 4px; display: block; max-height: 250px; background-color: rgba(15, 23, 42, 0.98); border: 1px solid rgba(185, 200, 222, 0.12); border-radius: var(--rounded-default); overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
+                            <div style="padding: 8px; border-bottom: 1px solid rgba(185, 200, 222, 0.08); position: relative;">
+                                <input type="text" 
+                                       id="assignee-search" 
+                                       name="search" 
+                                       class="form-control" 
+                                       placeholder="Search users..." 
+                                       style="min-height: 32px; padding: 4px 8px; font-size: 13px;"
+                                       hx-get="/users/dropdown/list"
+                                       hx-trigger="keyup changed delay:300ms"
+                                       hx-target="#users-dropdown-items"
+                                       hx-indicator="#assignee-search-loading">
+                                <div id="assignee-search-loading" class="htmx-indicator" style="position: absolute; right: 16px; top: 18px;">
+                                    <svg class="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--color-primary);">
+                                        <circle cx="12" cy="12" r="10" stroke="rgba(192, 193, 255, 0.2)"></circle>
+                                        <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div id="users-dropdown-items" 
+                                 style="overflow-y: auto; max-height: 190px;"
+                                 hx-get="/users/dropdown/list"
+                                 hx-trigger="load"
+                                 hx-target="this">
+                                 <div style="padding: 12px; text-align: center; color: var(--color-secondary); font-size: 13px;">Loading users...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="assign-note">Optional Note</label>
+                    <textarea id="assign-note" name="note" class="form-control" placeholder="e.g. Needs extra towels, verify TV works" rows="2" style="min-height: 60px; resize: vertical;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 16px; margin-top: 32px; border-top: 1px solid rgba(185, 200, 222, 0.08); padding-top: 20px;">
+                    <button type="button" class="btn btn-secondary" @click="showAssignModal = false" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Assign Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Container where edit modal gets swapped in -->
     <div id="modal-container"></div>
 
@@ -166,7 +299,7 @@
 {{ end }}
 
 {{ define "edit_room_modal" }}
-<div class="modal-backdrop" x-data="{ open: true }" x-show="open" style="animation: fadeIn 0.2s ease;">
+<div class="modal-backdrop" x-data="{ open: true }" x-show="open" style="animation: fadeIn 0.2s ease; z-index: 9999;">
     <div class="glass-card" @click.away="open = false" style="width: 100%; max-width: 500px; border-color: rgba(192, 193, 255, 0.15);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(185, 200, 222, 0.08); padding-bottom: 16px;">
             <h2 class="title-md" style="font-size: 20px;">Edit Room</h2>
@@ -202,4 +335,30 @@
         </form>
     </div>
 </div>
+{{ end }}
+
+{{ define "users_dropdown_items" }}
+    {{ range .Items }}
+    <button type="button" class="dropdown-item" 
+            @click="selectedName = '{{ .Username }}'; document.getElementById('assign-assigneeId').value = '{{ .ID }}'; open = false;"
+            style="display: block; width: 100%; padding: 8px 12px; text-align: left; background: none; border: none; color: white; cursor: pointer; font-size: 13px; border-bottom: 1px solid rgba(185, 200, 222, 0.04); transition: background 0.15s ease;">
+        <span style="font-weight: 600; display: block; color: white;">{{ .Username }}</span>
+        <span style="display: block; font-size: 11px; color: var(--color-secondary); margin-top: 2px;">{{ .Email }}</span>
+    </button>
+    {{ else }}
+    <div style="padding: 12px; text-align: center; color: var(--color-secondary); font-size: 13px;">No users found.</div>
+    {{ end }}
+
+    {{ if not .Pagination.Last }}
+    <div hx-get="/users/dropdown/list?page={{ .Pagination.NextPage }}&search={{ .Search }}"
+         hx-trigger="revealed"
+         hx-swap="outerHTML"
+         style="padding: 10px; text-align: center; color: var(--color-primary); font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <svg class="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--color-primary);">
+            <circle cx="12" cy="12" r="10" stroke="rgba(192, 193, 255, 0.2)"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+        </svg>
+        <span>Loading more...</span>
+    </div>
+    {{ end }}
 {{ end }}

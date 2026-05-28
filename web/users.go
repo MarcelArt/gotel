@@ -287,7 +287,7 @@ func (h *WebHandler) UserRolesListGet(c fiber.Ctx) error {
 	c.Request().URI().QueryArgs().Set("page", strconv.FormatInt(page, 10))
 	c.Request().URI().QueryArgs().Set("size", "10")
 	if search != "" {
-		c.Request().URI().QueryArgs().Set("filters", `[["name", "like", "%`+search+`%"]]`)
+		c.Request().URI().QueryArgs().Set("filters", `[["name", "like", "`+search+`"]]`)
 	} else {
 		c.Request().URI().QueryArgs().Del("filters")
 	}
