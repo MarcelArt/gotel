@@ -676,7 +676,7 @@ html.dark .alert-success {
 
 /* Workspace content padding wrapper */
 .workspace-content {
-  padding: 40px;
+  padding: 24px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -801,7 +801,7 @@ html.dark .alert-success {
 }
 
 .main-header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
