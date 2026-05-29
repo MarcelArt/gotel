@@ -1,14 +1,38 @@
 {{ define "content" }}
-<div class="dashboard-layout" x-data="{ currentTab: '{{ .ActiveTab }}', sidebarOpen: false }">
+<div class="dashboard-layout" 
+     x-data="{ 
+         currentTab: '{{ .ActiveTab }}', 
+         sidebarOpen: false, 
+         sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+         breadcrumbs: [],
+         getTabLabel(tab) {
+             const labels = {
+                 'dashboard': 'Dashboard',
+                 'users': 'Users',
+                 'roles': 'Roles',
+                 'categories': 'Categories',
+                 'locations': 'Locations',
+                 'items': 'Items',
+                 'rooms': 'Rooms',
+                 'housekeeping_tasks': 'Housekeeping Tasks',
+                 'settings': 'Settings',
+                 'licenses': 'Licenses'
+             };
+             return labels[tab] || (tab.charAt(0).toUpperCase() + tab.slice(1).replace('_', ' ').replace('-', ' '));
+         }
+     }"
+     @update-breadcrumbs.window="breadcrumbs = $event.detail">
     <!-- Sidebar Backdrop on Mobile -->
     <div class="sidebar-backdrop" x-show="sidebarOpen" @click="sidebarOpen = false" x-transition x-cloak></div>
 
     <!-- Sidebar Navigation -->
-    <aside class="sidebar" :class="{ 'open': sidebarOpen }">
+    <aside class="sidebar" :class="{ 'open': sidebarOpen, 'collapsed': sidebarCollapsed }">
         <div class="sidebar-header">
             <div class="sidebar-brand">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span>Gotel</span> Portal
+                <span x-show="!sidebarCollapsed" x-transition style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span>Gotel</span> Portal
+                </span>
             </div>
             <!-- Close Sidebar Button for Mobile -->
             <button type="button" class="btn-close-sidebar" @click="sidebarOpen = false" aria-label="Close menu">
@@ -22,22 +46,26 @@
                @click="currentTab = 'dashboard'; sidebarOpen = false"
                hx-get="/"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Dashboard' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-                Dashboard
+                <span x-show="!sidebarCollapsed">Dashboard</span>
             </a>
 
             {{ if or (.HasPermission "users#read") (.HasPermission "roles#read") }}
-            <div class="sidebar-section-label">User & Access</div>
+            <div class="sidebar-section-label">
+                <span x-show="!sidebarCollapsed">User & Access</span>
+            </div>
             {{ if .HasPermission "users#read" }}
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'users' }" 
                @click="currentTab = 'users'; sidebarOpen = false"
                hx-get="/users"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Users' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Users
+                <span x-show="!sidebarCollapsed">Users</span>
             </a>
             {{ end }}
             {{ if .HasPermission "roles#read" }}
@@ -46,24 +74,28 @@
                @click="currentTab = 'roles'; sidebarOpen = false"
                hx-get="/roles"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Roles' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                Roles
+                <span x-show="!sidebarCollapsed">Roles</span>
             </a>
             {{ end }}
             {{ end }}
 
             {{ if or (.HasPermission "categories#read") (.HasPermission "locations#read") (.HasPermission "items#read") }}
-            <div class="sidebar-section-label">Inventory</div>
+            <div class="sidebar-section-label">
+                <span x-show="!sidebarCollapsed">Inventory</span>
+            </div>
             {{ if .HasPermission "categories#read" }}
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'categories' }" 
                @click="currentTab = 'categories'; sidebarOpen = false"
                hx-get="/categories"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Categories' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                Categories
+                <span x-show="!sidebarCollapsed">Categories</span>
             </a>
             {{ end }}
             {{ if .HasPermission "locations#read" }}
@@ -72,9 +104,10 @@
                @click="currentTab = 'locations'; sidebarOpen = false"
                hx-get="/locations"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Locations' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                Locations
+                <span x-show="!sidebarCollapsed">Locations</span>
             </a>
             {{ end }}
             {{ if .HasPermission "items#read" }}
@@ -83,24 +116,28 @@
                @click="currentTab = 'items'; sidebarOpen = false"
                hx-get="/items"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Items' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><polygon points="12 22.08 12 12 3 6.92 3 17.08 12 22.08"></polygon><polygon points="12 12 21 6.92 21 17.08 12 22.08"></polygon><polygon points="12 12 3 6.92 12 1.84 21 6.92 12 12"></polygon></svg>
-                Items
+                <span x-show="!sidebarCollapsed">Items</span>
             </a>
             {{ end }}
             {{ end }}
 
             {{ if or (.HasPermission "rooms#read") (.HasPermission "housekeepingTasks#read") }}
-            <div class="sidebar-section-label">Rooms & Housekeeping</div>
+            <div class="sidebar-section-label">
+                <span x-show="!sidebarCollapsed">Rooms & Housekeeping</span>
+            </div>
             {{ if .HasPermission "rooms#read" }}
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'rooms' }" 
                @click="currentTab = 'rooms'; sidebarOpen = false"
                hx-get="/rooms"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Rooms' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14M2 20h20M14 12v.01"/></svg>
-                Rooms
+                <span x-show="!sidebarCollapsed">Rooms</span>
             </a>
             {{ end }}
             {{ if .HasPermission "housekeepingTasks#read" }}
@@ -109,63 +146,68 @@
                @click="currentTab = 'housekeeping_tasks'; sidebarOpen = false"
                hx-get="/housekeeping-tasks"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Housekeeping Tasks' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                Housekeeping Tasks
+                <span x-show="!sidebarCollapsed">Housekeeping Tasks</span>
             </a>
             {{ end }}
             {{ end }}
 
-            <div class="sidebar-section-label">System</div>
+            <div class="sidebar-section-label">
+                <span x-show="!sidebarCollapsed">System</span>
+            </div>
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'settings' }" 
                @click="currentTab = 'settings'; sidebarOpen = false"
                hx-get="/settings"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Settings' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                Settings
+                <span x-show="!sidebarCollapsed">Settings</span>
             </a>
             <a class="menu-item" 
                :class="{ 'active': currentTab === 'licenses' }" 
                @click="currentTab = 'licenses'; sidebarOpen = false"
                hx-get="/licenses"
                hx-target="#outlet"
-               hx-push-url="true">
+               hx-push-url="true"
+               :title="sidebarCollapsed ? 'Licenses' : ''">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                Licenses
+                <span x-show="!sidebarCollapsed">Licenses</span>
             </a>
         </nav>
 
         <div class="sidebar-footer">
-            <div class="user-profile-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
-                <div class="user-profile-summary" style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
-                    <div class="avatar">
+            <div class="user-profile-row" :style="sidebarCollapsed ? 'display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;' : 'display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;'">
+                <div class="user-profile-summary" :style="sidebarCollapsed ? 'display: flex; justify-content: center; width: 100%;' : 'display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;'">
+                    <div class="avatar" :title="sidebarCollapsed ? '{{ .User.Username }}' : ''">
                         {{ if .User.Username }}{{ slice .User.Username 0 1 }}{{ else }}U{{ end }}
                     </div>
-                    <div class="user-info-text" style="display: flex; flex-direction: column; min-width: 0; overflow: hidden;">
+                    <div class="user-info-text" x-show="!sidebarCollapsed" style="display: flex; flex-direction: column; min-width: 0; overflow: hidden;">
                         <span class="username-display" style="font-weight: 600; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: var(--color-foreground);">{{ .User.Username }}</span>
                         <span class="email-display" style="font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: var(--color-muted-foreground);">{{ .User.Email }}</span>
                     </div>
                 </div>
                 <!-- Desktop Theme Toggle -->
-                <button type="button" class="btn-theme-toggle" onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); updateThemeIcons();" aria-label="Toggle theme" style="background: none; border: none; cursor: pointer; color: var(--color-muted-foreground); display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: var(--rounded-default); transition: background-color var(--transition-fast), color var(--transition-fast);">
+                <button type="button" class="btn-theme-toggle" onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); updateThemeIcons();" :title="sidebarCollapsed ? 'Toggle Theme' : 'Toggle Theme'" aria-label="Toggle theme" style="background: none; border: none; cursor: pointer; color: var(--color-muted-foreground); display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: var(--rounded-default); transition: background-color var(--transition-fast), color var(--transition-fast);">
                     <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.07" x2="5.64" y2="17.66"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
             
             <form action="/logout" method="POST" style="margin: 0; width: 100%;">
-                <button type="submit" class="btn btn-secondary" style="min-height: 36px; height: 36px; font-size: 13px; width: 100%; border-radius: var(--rounded-xl);">
+                <button type="submit" class="btn btn-secondary" :title="sidebarCollapsed ? 'Logout' : ''" style="min-height: 36px; height: 36px; font-size: 13px; width: 100%; border-radius: var(--rounded-xl); display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    Logout
+                    <span x-show="!sidebarCollapsed">Logout</span>
                 </button>
             </form>
         </div>
     </aside>
 
     <!-- Main Content Workspace -->
-    <main class="main-content">
+    <main class="main-content" :class="{ 'collapsed': sidebarCollapsed }">
         <!-- Mobile Top Navigation Bar -->
         <div class="mobile-nav-bar">
             <button type="button" class="btn-menu" @click="sidebarOpen = true" aria-label="Open menu">
@@ -179,7 +221,77 @@
             </button>
         </div>
 
-        <div id="outlet">
+        <!-- Desktop Workspace Top Header -->
+        <header class="workspace-header">
+            <div class="workspace-header-left">
+                <!-- Sidebar Collapse Trigger -->
+                <button type="button" class="btn-sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('sidebarCollapsed', sidebarCollapsed)" aria-label="Toggle Sidebar">
+                    <template x-if="!sidebarCollapsed">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                            <path d="M17 16l-4-4 4-4"></path>
+                        </svg>
+                    </template>
+                    <template x-if="sidebarCollapsed">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                            <path d="M13 8l4 4-4 4"></path>
+                        </svg>
+                    </template>
+                </button>
+                
+                <div class="workspace-header-separator"></div>
+                
+                <!-- Breadcrumbs -->
+                <nav class="breadcrumbs" aria-label="Breadcrumb">
+                    <ol class="breadcrumb-list">
+                        <li class="breadcrumb-item">
+                            <a href="/" 
+                               hx-get="/"
+                               hx-target="#outlet"
+                               hx-push-url="true"
+                               @click.prevent="currentTab = 'dashboard'; breadcrumbs = []"
+                               class="breadcrumb-link">Gotel</a>
+                        </li>
+                        
+                        <!-- Default single tab breadcrumb if no custom breadcrumbs are present -->
+                        <template x-if="breadcrumbs.length === 0">
+                            <li class="breadcrumb-item" style="display: flex; align-items: center; gap: 8px;">
+                                <span class="breadcrumb-separator">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </span>
+                                <span class="breadcrumb-current" x-text="getTabLabel(currentTab)">Dashboard</span>
+                            </li>
+                        </template>
+
+                        <!-- Custom breadcrumbs -->
+                        <template x-for="(item, index) in breadcrumbs" :key="index">
+                            <li class="breadcrumb-item" style="display: flex; align-items: center; gap: 8px;">
+                                <span class="breadcrumb-separator">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </span>
+                                <template x-if="index < breadcrumbs.length - 1">
+                                    <a :href="item.path" 
+                                       hx-get=""
+                                       hx-target="#outlet"
+                                       hx-push-url="true"
+                                       @click.prevent="currentTab = item.tab; htmx.ajax('GET', item.path, {target: '#outlet', pushUrl: true})"
+                                       class="breadcrumb-link" 
+                                       x-text="item.label"></a>
+                                </template>
+                                <template x-if="index === breadcrumbs.length - 1">
+                                    <span class="breadcrumb-current" x-text="item.label"></span>
+                                </template>
+                            </li>
+                        </template>
+                    </ol>
+                </nav>
+            </div>
+        </header>
+
+        <div id="outlet" class="workspace-content">
             {{ template "outlet" . }}
         </div>
     </main>

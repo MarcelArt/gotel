@@ -1,5 +1,5 @@
 {{ define "outlet" }}
-<div x-data="{ showCreateModal: false }">
+<div x-data="{ showCreateModal: false }" x-init="$dispatch('update-breadcrumbs', [])">
     <style>
     .dropdown-menu-list {
         display: flex;

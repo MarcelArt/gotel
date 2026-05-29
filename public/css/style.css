@@ -493,7 +493,65 @@ html.dark .alert-success {
   position: fixed;
   height: 100vh;
   z-index: 10;
-  transition: transform var(--transition-normal), background-color var(--transition-normal), border-color var(--transition-normal);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform var(--transition-normal), background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+/* Sidebar Collapsed State overrides */
+@media (min-width: 769px) {
+  .sidebar.collapsed {
+    width: 64px;
+  }
+  
+  .sidebar.collapsed .sidebar-header {
+    padding: 16px 0;
+    justify-content: center;
+  }
+  
+  .sidebar.collapsed .sidebar-brand {
+    justify-content: center;
+    gap: 0;
+  }
+  
+  .sidebar.collapsed .sidebar-menu {
+    padding: 16px 8px;
+    align-items: center;
+  }
+  
+  .sidebar.collapsed .menu-item {
+    width: 40px;
+    height: 40px;
+    padding: 0 !important;
+    justify-content: center;
+    border-radius: var(--rounded-xl) !important;
+  }
+  
+  .sidebar.collapsed .menu-item svg {
+    margin: 0;
+  }
+  
+  .sidebar.collapsed .sidebar-section-label {
+    padding: 0 !important;
+    margin: 12px 0 8px 0 !important;
+    font-size: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .sidebar.collapsed .sidebar-footer {
+    padding: 16px 8px;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .sidebar.collapsed .user-profile-row {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  
+  .sidebar.collapsed .user-profile-summary {
+    justify-content: center !important;
+    width: 100% !important;
+  }
 }
 
 .sidebar-header {
@@ -605,10 +663,141 @@ html.dark .alert-success {
 .main-content {
   margin-left: 280px;
   flex-grow: 1;
-  padding: 40px;
+  padding: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content.collapsed {
+  margin-left: 64px;
+}
+
+/* Workspace content padding wrapper */
+.workspace-content {
+  padding: 40px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .workspace-content {
+    padding: 0;
+  }
+}
+
+/* Workspace top header styles */
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 24px 0 12px;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .workspace-header {
+  background-color: rgba(23, 23, 23, 0.85);
+}
+
+@media (max-width: 768px) {
+  .workspace-header {
+    display: none;
+  }
+}
+
+.workspace-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-md);
+  background: none;
+  border: none;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-sidebar-toggle:hover {
+  color: var(--color-foreground);
+  background-color: var(--color-secondary-bg);
+}
+
+.workspace-header-separator {
+  width: 1px;
+  height: 16px;
+  background-color: var(--color-border);
+}
+
+/* Breadcrumbs style */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-foreground);
+}
+
+.breadcrumb-link-inactive {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  user-select: none;
+}
+
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: var(--color-muted-foreground);
+  opacity: 0.6;
+}
+
+.breadcrumb-current {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  user-select: none;
 }
 
 .main-header {
