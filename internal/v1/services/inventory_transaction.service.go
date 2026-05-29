@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/MarcelArt/gotel/internal/common"
@@ -50,7 +51,22 @@ func (s *InventoryTransactionService) GetByID(c common.Context, id any) (entitie
 }
 
 func (s *InventoryTransactionService) GetItemCounts(itemID any, timeRanges ...time.Time) ([]models.ItemCount, error) {
-	return s.repo.GetItemCounts(itemID, timeRanges...)
+	itemCounts, err := s.repo.GetItemCounts(itemID, timeRanges...)
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving item counts: %w", err)
+	}
+
+	actual, err := s.repo.GetItemActualQuantity(itemID)
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving actual quantity: %w", err)
+	}
+
+	actualQuantity := models.ItemCount{TransactionType: "ACTUAL", Quantity: actual}
+
+	itemCounts = append(itemCounts, actualQuantity)
+
+	return itemCounts, nil
+
 }
 
 func (s *InventoryTransactionService) GetItemActualQuantity(itemID any) (float64, error) {
