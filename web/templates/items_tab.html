@@ -249,7 +249,60 @@
                 <!-- Picture File Upload -->
                 <div class="form-group" style="margin-top: 16px;">
                     <label for="create-file">Picture File</label>
-                    <input type="file" id="create-file" name="file" accept="image/*" class="form-control" style="padding-top: 8px;">
+                    <div x-data="{ 
+                        filePreview: null,
+                        fileName: '',
+                        handleFileChange(event) {
+                            const file = event.target.files[0];
+                            if (file) {
+                                this.fileName = file.name;
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    this.filePreview = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                this.filePreview = null;
+                                this.fileName = '';
+                            }
+                        }
+                    }" class="file-upload-dropzone">
+                        <div @click="$refs.fileInput.click()" 
+                             class="dropzone-area" 
+                             :class="{ 'has-file': filePreview }">
+                            
+                            <input type="file" 
+                                   id="create-file" 
+                                   name="file" 
+                                   accept="image/*" 
+                                   x-ref="fileInput"
+                                   @change="handleFileChange($event)"
+                                   style="display: none;">
+                            
+                            <!-- Default State -->
+                            <template x-if="!filePreview">
+                                <div class="dropzone-content">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <div class="dropzone-text-primary">Click to upload picture</div>
+                                    <div class="dropzone-text-secondary">PNG, JPG or WEBP up to 5MB</div>
+                                </div>
+                            </template>
+                            
+                            <!-- Preview State -->
+                            <template x-if="filePreview">
+                                <div class="dropzone-preview-container">
+                                    <img :src="filePreview" class="dropzone-preview-image" alt="Upload preview">
+                                    <div class="dropzone-file-info">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span x-text="fileName" class="dropzone-filename"></span>
+                                        <button type="button" class="btn-remove-file" @click.stop="filePreview = null; fileName = ''; $refs.fileInput.value = ''">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="display: flex; gap: 16px; margin-top: 32px; border-top: 1px solid rgba(185, 200, 222, 0.08); padding-top: 20px;">
@@ -339,12 +392,66 @@
             <div class="form-group" style="margin-top: 16px;">
                 <label for="edit-file">Picture File (Optional)</label>
                 {{ if .Item.Picture }}
-                <div style="margin-bottom: 8px;">
+                <div style="margin-bottom: 12px;">
                     <span style="font-size: 11px; color: var(--color-secondary); display: block; margin-bottom: 4px;">Current Picture:</span>
-                    <img src="{{ .Item.Picture }}" alt="Current Item Picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(185, 200, 222, 0.1);">
+                    <img src="{{ .Item.Picture }}" alt="Current Item Picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: var(--rounded-md); border: 1px solid var(--color-border);">
                 </div>
                 {{ end }}
-                <input type="file" id="edit-file" name="file" accept="image/*" class="form-control" style="padding-top: 8px;">
+                
+                <div x-data="{ 
+                    filePreview: null,
+                    fileName: '',
+                    handleFileChange(event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            this.fileName = file.name;
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.filePreview = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            this.filePreview = null;
+                            this.fileName = '';
+                        }
+                    }
+                }" class="file-upload-dropzone">
+                    <div @click="$refs.fileInput.click()" 
+                         class="dropzone-area" 
+                         :class="{ 'has-file': filePreview }">
+                        
+                        <input type="file" 
+                               id="edit-file" 
+                               name="file" 
+                               accept="image/*" 
+                               x-ref="fileInput"
+                               @change="handleFileChange($event)"
+                               style="display: none;">
+                        
+                        <!-- Default State -->
+                        <template x-if="!filePreview">
+                            <div class="dropzone-content">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <div class="dropzone-text-primary">Click to upload new picture</div>
+                                <div class="dropzone-text-secondary">PNG, JPG or WEBP up to 5MB</div>
+                            </div>
+                        </template>
+                        
+                        <!-- Preview State -->
+                        <template x-if="filePreview">
+                            <div class="dropzone-preview-container">
+                                <img :src="filePreview" class="dropzone-preview-image" alt="Upload preview">
+                                <div class="dropzone-file-info">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <span x-text="fileName" class="dropzone-filename"></span>
+                                    <button type="button" class="btn-remove-file" @click.stop="filePreview = null; fileName = ''; $refs.fileInput.value = ''">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
             
             <div style="display: flex; gap: 16px; margin-top: 32px; border-top: 1px solid rgba(185, 200, 222, 0.08); padding-top: 20px;">

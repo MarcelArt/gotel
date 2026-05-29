@@ -1338,3 +1338,124 @@ html:not(.dark) [style*="border-bottom:1px solid rgba(185, 200, 222"],
 html:not(.dark) [style*="border-bottom: 1px solid rgba(185,200,222"] {
   border-bottom: 1px solid var(--color-border) !important;
 }
+
+/* Modern File Upload Dropzone Styles */
+.file-upload-dropzone {
+  width: 100%;
+}
+
+.dropzone-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 24px 16px;
+  background-color: var(--color-bg);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--rounded-lg);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  user-select: none;
+}
+
+.dark .dropzone-area {
+  background-color: rgba(15, 23, 42, 0.2);
+}
+
+.dropzone-area:hover {
+  border-color: var(--color-ring);
+  background-color: var(--color-secondary-bg);
+}
+
+.dropzone-area.has-file {
+  border-style: solid;
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+  padding: 16px;
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.upload-icon {
+  color: var(--color-muted-foreground);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.dropzone-area:hover .upload-icon {
+  color: var(--color-foreground);
+  transform: translateY(-2px);
+}
+
+.dropzone-text-primary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.dropzone-text-secondary {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+.dropzone-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.dropzone-preview-image {
+  max-height: 180px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: var(--rounded-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+}
+
+.dropzone-file-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-secondary-bg);
+  color: var(--color-foreground);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--rounded-full);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.dropzone-filename {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 240px;
+  font-weight: 500;
+}
+
+.btn-remove-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--rounded-full);
+  transition: all var(--transition-fast);
+}
+
+.btn-remove-file:hover {
+  background-color: var(--color-destructive-bg);
+  color: var(--color-error);
+}
