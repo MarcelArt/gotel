@@ -1,7 +1,7 @@
 ---
-version: 1.0.0
-name: Gotel Portal Design System
-description: A modern, minimalist, high-contrast design system featuring a striking golden yellow accent, dark grey ink, and friendly rounded corners, built with Vanilla CSS variables, Go html/template, HTMX, and Alpine.js.
+version: alpha
+name: Vite App Design System
+description: A modern, minimalist, high-contrast design system featuring a striking golden yellow accent, dark grey ink, and friendly rounded corners, built with Tailwind CSS v4 and React.
 colors:
   # Light Mode (Default)
   background: "#ffffff"
@@ -133,13 +133,13 @@ components:
     padding: "12px"
 ---
 
-# Gotel Portal Design System
+# Vite App Design System
 
-This document specifies the design system and visual identity rules for the Gotel Portal project. It acts as a contract between designers, developers, and AI coding agents to ensure visual consistency across light and dark modes.
+This document specifies the design system and visual identity rules for the Vite App project. It acts as a contract between designers, developers, and AI coding agents to ensure visual consistency across light and dark modes.
 
 ## Overview
 
-The visual identity is defined by a bright, clean, minimalist design style. The system uses **Nunito Sans** as its primary typeface, offering a friendly yet professional voice. A high-contrast, energetic golden yellow (`#fdc700`) accent anchors critical interactions, combined with dark gray ink and soft, generous rounded corners to create an approachable, modern interface. It uses Vanilla CSS with variables for layout styling, combined with Go templates, HTMX, and Alpine.js for dynamic interactions.
+The visual identity is defined by a bright, clean, minimalist design style. The system uses **Nunito Sans** as its primary typeface, offering a friendly yet professional voice. A high-contrast, energetic golden yellow (`#fdc700`) accent anchors critical interactions, combined with dark gray ink and soft, generous rounded corners to create an approachable, modern interface.
 
 ## Colors
 

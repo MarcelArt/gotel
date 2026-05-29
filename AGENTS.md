@@ -17,6 +17,11 @@ This project enforces strict guidelines for AI coding agents to protect the work
    - **Rule:** If a backend modification is needed to support a frontend feature, do not make the change yourself. Instead, document the exact issue, code path, and recommendation, and request that the USER apply the fix.
    - **Rule:** Conversely, if the task is explicitly focused on backend refactoring/features, do not modify frontend templates or stylesheets.
 
+4. **UI Layout and State Rules (Collapsible Sidebar, Breadcrumbs, & File Uploads)**
+   - **Collapsible Sidebar:** The sidebar collapse/minimize state is managed via Alpine.js and stored in `localStorage` under `sidebarCollapsed` (persisting the state across navigations). Always use `:class="{ 'collapsed': sidebarCollapsed }"` for toggling responsive styles on sidebar/main content.
+   - **Dynamic Breadcrumbs:** Page breadcrumbs are located in the sticky top header. Main navigation tabs should clear custom sub-breadcrumbs, while nested/detail pages (such as asset instances, stock logs, or transaction lists) must dispatch their breadcrumb hierarchy on load via Alpine's `$dispatch('update-breadcrumbs', [...])`. Clickable breadcrumbs must route back via HTMX (`hx-get`) and trigger the correct active `currentTab` state in the sidebar.
+   - **Modernized File Uploads:** All file upload fields must be styled as modern drag-and-drop dropzone components instead of plain default browser input controls. They must utilize Alpine.js to show dynamic image preview thumbnails and allow clearing selected files via a reset button.
+
 ## General Coding Standards
 
 - **Maintain Documentation Integrity:** Retain all pre-existing comments, docstrings, and struct annotations unless explicitly requested otherwise.
