@@ -640,9 +640,12 @@ html.dark .alert-success {
 }
 
 .dashboard-card:hover {
-  border-color: var(--color-primary);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+html.dark .dashboard-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .card-title {
