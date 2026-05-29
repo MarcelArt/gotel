@@ -1,172 +1,202 @@
 ---
-name: Hospitality Excellence
+version: alpha
+name: Vite App Design System
+description: A modern, minimalist, high-contrast design system featuring a striking golden yellow accent, dark grey ink, and friendly rounded corners, built with Tailwind CSS v4 and React.
 colors:
-  surface: '#0b1326'
-  surface-dim: '#0b1326'
-  surface-bright: '#31394d'
-  surface-container-lowest: '#060e20'
-  surface-container-low: '#131b2e'
-  surface-container: '#171f33'
-  surface-container-high: '#222a3d'
-  surface-container-highest: '#2d3449'
-  on-surface: '#dae2fd'
-  on-surface-variant: '#c7c4d7'
-  inverse-surface: '#dae2fd'
-  inverse-on-surface: '#283044'
-  outline: '#908fa0'
-  outline-variant: '#464554'
-  surface-tint: '#c0c1ff'
-  primary: '#c0c1ff'
-  on-primary: '#1000a9'
-  primary-container: '#8083ff'
-  on-primary-container: '#0d0096'
-  inverse-primary: '#494bd6'
-  secondary: '#b9c8de'
-  on-secondary: '#233143'
-  secondary-container: '#39485a'
-  on-secondary-container: '#a7b6cc'
-  tertiary: '#bcc7de'
-  on-tertiary: '#263143'
-  tertiary-container: '#8691a7'
-  on-tertiary-container: '#1f2a3c'
-  error: '#ffb4ab'
-  on-error: '#690005'
-  error-container: '#93000a'
-  on-error-container: '#ffdad6'
-  primary-fixed: '#e1e0ff'
-  primary-fixed-dim: '#c0c1ff'
-  on-primary-fixed: '#07006c'
-  on-primary-fixed-variant: '#2f2ebe'
-  secondary-fixed: '#d4e4fa'
-  secondary-fixed-dim: '#b9c8de'
-  on-secondary-fixed: '#0d1c2d'
-  on-secondary-fixed-variant: '#39485a'
-  tertiary-fixed: '#d8e3fb'
-  tertiary-fixed-dim: '#bcc7de'
-  on-tertiary-fixed: '#111c2d'
-  on-tertiary-fixed-variant: '#3c475a'
-  background: '#0b1326'
-  on-background: '#dae2fd'
-  surface-variant: '#2d3449'
+  # Light Mode (Default)
+  background: "#ffffff"
+  foreground: "#0a0a0a"
+  card: "#ffffff"
+  card-foreground: "#0a0a0a"
+  popover: "#ffffff"
+  popover-foreground: "#0a0a0a"
+  primary: "#fdc700"
+  primary-foreground: "#733e0a"
+  secondary: "#f4f4f5"
+  secondary-foreground: "#18181b"
+  muted: "#f5f5f5"
+  muted-foreground: "#737373"
+  accent: "#f5f5f5"
+  accent-foreground: "#171717"
+  destructive: "#e7000b"
+  border: "#e5e5e5"
+  input: "#e5e5e5"
+  ring: "#a1a1a1"
+  chart-1: "#ffb86a"
+  chart-2: "#ff6900"
+  chart-3: "#f54900"
+  chart-4: "#ca3500"
+  chart-5: "#9f2d00"
+  sidebar: "#fafafa"
+  sidebar-foreground: "#0a0a0a"
+  sidebar-primary: "#d08700"
+  sidebar-primary-foreground: "#fefce8"
+  sidebar-accent: "#f5f5f5"
+  sidebar-accent-foreground: "#171717"
+  sidebar-border: "#e5e5e5"
+  sidebar-ring: "#a1a1a1"
+
+  # Dark Mode Overrides
+  dark-background: "#0a0a0a"
+  dark-foreground: "#fafafa"
+  dark-card: "#171717"
+  dark-card-foreground: "#fafafa"
+  dark-popover: "#171717"
+  dark-popover-foreground: "#fafafa"
+  dark-primary: "#f0b100"
+  dark-primary-foreground: "#733e0a"
+  dark-secondary: "#27272a"
+  dark-secondary-foreground: "#fafafa"
+  dark-muted: "#262626"
+  dark-muted-foreground: "#a1a1a1"
+  dark-accent: "#262626"
+  dark-accent-foreground: "#fafafa"
+  dark-destructive: "#ff6467"
+  dark-border: "#ffffff1a"
+  dark-input: "#ffffff26"
+  dark-ring: "#737373"
+  dark-sidebar: "#171717"
+  dark-sidebar-foreground: "#fafafa"
+  dark-sidebar-primary: "#f0b100"
+  dark-sidebar-primary-foreground: "#fefce8"
+  dark-sidebar-accent: "#262626"
+  dark-sidebar-accent-foreground: "#fafafa"
+  dark-sidebar-ring: "#737373"
+
 typography:
-  headline-xl:
-    fontFamily: Manrope
-    fontSize: 40px
-    fontWeight: '700'
-    lineHeight: 48px
-    letterSpacing: -0.02em
-  headline-lg:
-    fontFamily: Manrope
-    fontSize: 32px
-    fontWeight: '600'
-    lineHeight: 40px
-    letterSpacing: -0.01em
-  headline-lg-mobile:
-    fontFamily: Manrope
+  h1:
+    fontFamily: Nunito Sans
     fontSize: 24px
-    fontWeight: '600'
-    lineHeight: 32px
-  headline-md:
-    fontFamily: Manrope
-    fontSize: 24px
-    fontWeight: '600'
-    lineHeight: 32px
-  body-lg:
-    fontFamily: Inter
-    fontSize: 18px
-    fontWeight: '400'
-    lineHeight: 28px
+    fontWeight: 700
+    lineHeight: 1.2
   body-md:
-    fontFamily: Inter
-    fontSize: 16px
-    fontWeight: '400'
-    lineHeight: 24px
-  body-sm:
-    fontFamily: Inter
+    fontFamily: Nunito Sans
     fontSize: 14px
-    fontWeight: '400'
-    lineHeight: 20px
-  label-md:
-    fontFamily: Inter
+    fontWeight: 400
+    lineHeight: 2.0
+  mono-xs:
+    fontFamily: monospace
     fontSize: 12px
-    fontWeight: '600'
-    lineHeight: 16px
-    letterSpacing: 0.05em
-rounded:
-  sm: 0.25rem
-  DEFAULT: 0.5rem
-  md: 0.75rem
-  lg: 1rem
-  xl: 1.5rem
-  full: 9999px
+    fontWeight: 400
+    lineHeight: 1.5
+
 spacing:
-  unit: 8px
-  container-max: 1280px
-  gutter: 24px
-  margin-desktop: 64px
-  margin-mobile: 20px
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 24px
+  xl: 32px
+  xxl: 48px
+  xxxl: 64px
+
+rounded:
+  sm: 6px
+  md: 8px
+  lg: 10px
+  xl: 14px
+  xxl: 18px
+  xxxl: 22px
+  xxxxl: 26px
+  full: 9999px
+
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
+    rounded: "{rounded.xxl}"
+    height: "32px"
+    padding: "12px"
+  button-primary-hover:
+    backgroundColor: "#fdc700cc"
+  button-secondary:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.secondary-foreground}"
+    rounded: "{rounded.xxl}"
+    height: "32px"
+    padding: "12px"
+  button-outline:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.xxl}"
+    height: "32px"
+    padding: "12px"
+  button-ghost:
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.xxl}"
+    height: "32px"
+    padding: "12px"
+  button-destructive:
+    backgroundColor: "#e7000b1a"
+    textColor: "{colors.destructive}"
+    rounded: "{rounded.xxl}"
+    height: "32px"
+    padding: "12px"
 ---
 
-## Brand & Style
+# Vite App Design System
 
-This design system is engineered for high-end service environments, evoking a sense of quiet luxury, precision, and unwavering reliability. The target audience includes discerning travelers, estate managers, and luxury service providers who require clarity and elegance in high-pressure, low-light environments.
+This document specifies the design system and visual identity rules for the Vite App project. It acts as a contract between designers, developers, and AI coding agents to ensure visual consistency across light and dark modes.
 
-The visual style is **Minimalist Glassmorphism**. It prioritizes deep, atmospheric depth through the use of translucent layers and subtle background blurs, creating a digital experience that feels as refined as a concierge desk at midnight. The interface avoids unnecessary decoration, allowing high-quality imagery and typography to lead the user experience.
+## Overview
 
-- **Emotional Response:** Calm, empowered, sophisticated.
-- **Visual Strategy:** Utilize heavy whitespace (even in dark mode) to prevent visual clutter and rely on the interplay of charcoal surfaces to define hierarchy.
+The visual identity is defined by a bright, clean, minimalist design style. The system uses **Nunito Sans** as its primary typeface, offering a friendly yet professional voice. A high-contrast, energetic golden yellow (`#fdc700`) accent anchors critical interactions, combined with dark gray ink and soft, generous rounded corners to create an approachable, modern interface.
 
 ## Colors
 
-The palette is anchored in a nocturnal spectrum designed to reduce eye strain while maintaining a premium aesthetic.
+The color palette is built around dynamic light and dark modes, prioritizing high readability and intentional visual focus:
 
-- **Primary (Vibrant Indigo):** Reserved strictly for primary calls to action, active states, and critical status indicators. It provides a sharp, luminous contrast against the dark background.
-- **Secondary (Slate):** Used for supporting text, icons, and secondary information to maintain a clear visual hierarchy.
-- **Surfaces:** The foundation is a deep **Charcoal (#0F172A)**. UI containers and cards utilize **Dark Slate (#1E293B)** to create a layered effect without the need for harsh borders.
-- **Accents:** Semantic colors (Success, Warning, Error) should be desaturated slightly to prevent "vibrating" against the dark surfaces.
+- **Primary (#fdc700 / #f0b100):** Golden Yellow is the main brand accent, used for high-importance visual elements and primary action buttons.
+- **Primary Foreground (#733e0a):** Rich dark brown ensures excellent WCAG AA contrast over the yellow background.
+- **Background (#ffffff / #0a0a0a):** Pure white in light mode and deep charcoal in dark mode provide the workspace foundation.
+- **Secondary (#f4f4f5 / #27272a):** Soft cool-gray tones used for auxiliary content areas and subtle groupings.
+- **Muted/Accent (#f5f5f5 / #262626):** Light backgrounds for tooltips, card states, and hover feedback.
+- **Destructive (#e7000b / #ff6467):** A sharp, bright red to signal errors, warnings, and dangerous actions.
+- **Borders & Inputs:** Neutral frame boundaries to group relative layout items without adding visual noise.
 
 ## Typography
 
-Typography in this design system is balanced and highly legible. **Manrope** provides a modern, geometric warmth for headlines, while **Inter** ensures maximum functional clarity for dense information like booking details and schedules.
+Typography is handled using **Nunito Sans** for all text (headings and body).
 
-- **Contrast:** Ensure all body text maintains at least a 4.5:1 contrast ratio against charcoal backgrounds. 
-- **Scale:** Use the `headline-xl` sparingly for high-impact hero sections. 
-- **Tracking:** Labels use increased letter spacing to enhance readability at small sizes on mobile devices.
+- **Headlines:** Set in `Nunito Sans` bold/semibold for clear readability and a welcoming character.
+- **Body text:** Set in `Nunito Sans` regular at `14px` (`text-sm`) with a generous `leading-loose` line height (2x font-size) to maximize long-form readability.
+- **Monospace:** Standard system monospace (`monospace`) is used for technical indicators, keyboard keycaps, code, and configuration output.
 
-## Layout & Spacing
+## Layout
 
-The layout philosophy follows a **Fluid Grid** model with a strict 8px rhythmic scale. This ensures consistency across all components and page structures.
+The layout is built with fluid grid alignments, utilizing a standard 8px-based spacing scale:
 
-- **Grid:** A 12-column grid for desktop, 8-column for tablet, and 4-column for mobile.
-- **Margins:** Generous outer margins are used on desktop to center the content and provide a "gallery" feel.
-- **Density:** In management views, spacing can be tightened to 4px increments, but for guest-facing interfaces, use 16px and 24px units to maintain an airy, luxury feel.
+- A strict spacing rhythm is maintained using `xs` (4px), `sm` (8px), `md` (16px), `lg` (24px), and `xl` (32px).
+- Primary page padding starts at `24px` (`p-6`) for workspace margins.
+- Flex layouts with vertical gap hierarchies are used to establish logical information groupings.
 
 ## Elevation & Depth
 
-Visual hierarchy is established through **Tonal Layers** and **Glassmorphism**. 
+A flat and tonal design style is preferred over heavy box shadows. 
 
-1. **Base (Level 0):** Deep Charcoal (#0F172A). The "ground" of the application.
-2. **Surface (Level 1):** Dark Slate (#1E293B). Used for cards and secondary navigation elements.
-3. **Overlay (Level 2):** Semi-transparent Slate with a 12px Backdrop Blur. Used for floating headers, modals, and dropdown menus.
-
-**Shadows:** Shadows are rarely used. When necessary, use a large, soft blur (32px+) with a low-opacity Indigo tint (#6366F1 at 15%) to suggest a subtle "glow" rather than a physical shadow cast by a light source.
+- Depth is achieved via background layer separation (e.g., pure white content cards sitting on off-white surfaces).
+- Subtle border framing is used to group relative elements (`#e5e5e5` in light mode, soft semi-transparent white in dark mode).
+- Focus states use a ring glow (`focus-visible:ring-3`) to communicate active keyboard focus states.
 
 ## Shapes
 
-The shape language is refined and approachable. A consistent **0.5rem (8px)** corner radius is applied to standard components like buttons and input fields.
+The shape language is defined by **Friendly Rounded Corners**:
 
-- **Large Components:** Cards and large containers should use `rounded-lg` (1rem) to soften the overall interface.
-- **Interactive Elements:** Small interactive elements like checkboxes use `rounded-sm` (4px) to maintain a sense of precision.
+- Standard cards, containers, and inputs use a base corner radius of `10px` (`rounded-lg` or `0.625rem`) to create soft, approachable bounds.
+- Small sub-components use `8px` (`rounded-md` or `0.5rem`) and `6px` (`rounded-sm` or `0.375rem`).
+- Interactive buttons utilize a softer, more rounded corner footprint of `18px` (`rounded-2xl` or `1.125rem`).
 
 ## Components
 
-Components are optimized for visibility and interaction in dark mode.
+The system specifies the following rules for component atoms:
 
-- **Buttons:** 
-    - *Primary:* Solid Indigo with white text. High-contrast.
-    - *Secondary:* Ghost style with a Slate border (1px) and subtle hover fill.
-- **Input Fields:** Use a Dark Slate fill with a 1px border. The border transitions to Indigo on focus. Error states use a soft coral-red border, never pure red, to avoid harshness.
-- **Cards:** No borders by default. Depth is communicated via the Dark Slate surface color against the Charcoal background. On hover, apply a subtle 1px Indigo stroke.
-- **Chips/Badges:** Low-opacity Indigo background with high-opacity Indigo text for an "illuminated" effect.
-- **Lists:** Separated by thin, low-contrast Slate lines (opacity 10%) to guide the eye without breaking the flow of the page.
-- **Specialty Components:** Include a "Night Mode Optimizer"—a toggle that further desaturates images to ensure the UI remains comfortable in pitch-black environments.
+- **Buttons:** Built on an `18px` rounded footprint, utilizing standard heights (e.g., `32px` default height) and horizontal padding. 
+- **Button Hover States:** Hover states utilize opacity reductions (e.g., primary shifts to 80% opacity) or subtle color-mixes to preserve design consistency while giving clear interactive feedback.
+- **Destructive Button:** Uses a subtle red background overlay (`10%` to `20%` opacity) with sharp red text to ensure visibility without overwhelming the layout.
+
+## Do's and Don'ts
+
+- **Do** use the golden yellow accent for primary visual highlights and call-to-actions.
+- **Do** ensure primary buttons use the high-contrast brown text (`#733e0a`) for legibility.
+- **Don't** mix the `18px` button radius with sharp corners on UI panels.
+- **Do** support light and dark theme switching cleanly via the `dark` class selector.
+- **Don't** use arbitrary padding values; stick strictly to the 4px/8px-based spacing scale.

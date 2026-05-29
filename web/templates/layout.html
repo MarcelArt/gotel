@@ -7,8 +7,17 @@
     <meta name="description" content="Gotel - Premium Hospitality and Operations Portal">
     <title>{{ if .Title }}{{ .Title }}{{ else }}Gotel{{ end }}</title>
     
+    <script>
+        // Early detection to prevent flash of light/dark theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="/public/css/style.css?v=1.0.3">
+    <link rel="stylesheet" href="/public/css/style.css?v=1.1.3">
     
     <!-- HTMX -->
     <script src="/public/scripts/htmx.min.js"></script>
@@ -96,6 +105,25 @@
                 if (progressBar) progressBar.style.opacity = '0';
             });
         })();
+    </script>
+
+
+    <script>
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('.sun-icon').forEach(el => {
+                el.style.display = isDark ? 'block' : 'none';
+            });
+            document.querySelectorAll('.moon-icon').forEach(el => {
+                el.style.display = isDark ? 'none' : 'block';
+            });
+        }
+        // Initialize icons on DOM load
+        document.addEventListener('DOMContentLoaded', updateThemeIcons);
+        // Run immediately in case DOM is already parsed
+        updateThemeIcons();
+        // Listen to HTMX swaps to ensure icons are correctly shown on partial updates
+        document.body.addEventListener('htmx:afterSwap', updateThemeIcons);
     </script>
 </body>
 </html>
